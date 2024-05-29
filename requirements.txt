@@ -1,0 +1,8 @@
+langchain
+openai
+langchain_openai
+neo4j-driver
+streamlit
+langchain_google_genai
+langchain-community
+langchainhub
