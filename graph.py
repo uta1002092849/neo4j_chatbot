@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain_community.graphs import Neo4jGraph
+from langchain_community.graphs.neo4j_graph import Neo4jGraph
 
 graph = Neo4jGraph(
     url = st.secrets['NEO4J_URI'],
