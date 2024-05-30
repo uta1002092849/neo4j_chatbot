@@ -8,11 +8,7 @@ To run the application, you must install the libraries listed in `requirements.t
 [source,sh]
 pip install -r requirements.txt
 
-
 Then run the `streamlit run` command to start the app on link:http://localhost:8501/[http://localhost:8501/^].
-If streamlit: command not found
-Uninstall using: pip uninstall streamlit
-Then reinstall it: pip install streamlit
 
 [source,sh]
 streamlit run bot.py
