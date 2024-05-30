@@ -77,7 +77,6 @@ agent_executor = AgentExecutor(
     )
 
 def generate_response(prompt):
-
     try:
         response = agent_executor.invoke({"input": prompt})
     except Exception as e:

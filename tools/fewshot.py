@@ -12,8 +12,10 @@ Convert the user's question based on the schema.
 Use only the provided relationship types and properties in the schema.
 Do not use any other relationship types or properties that are not provided.
 Do not be picky about the exact wording of the context
+
 Fine Tuning:
 ALWAYS USED AS TO RENAME THE COLUMN NAME TO THE EXPECTED OUTPUT NAME SPECIFIED IN THE QUESTION.
+For example, never return count(u) as count, always return count(u) as totalNumberOfExperimentalUnits
 
 Example Cypher Statements:
 
@@ -21,6 +23,10 @@ Example Cypher Statements:
 MATCH (u:ExperimentalUnit)-[:hasChemSample]->(c:SoilChemicalSample)
 WHERE (c.totalSoilCarbon) IS NOT NULL AND NOT isNaN(c.totalSoilCarbon)
 RETURN u.expUnit_UID, (c.totalSoilCarbon) as averageSoilCarbonForTargetedUnit
+
+2. How to compute total number of experimental units?
+MATCH (u:ExperimentalUnit)
+RETURN count(u) as totalNumberOfExperimentalUnits
 
 Schema:
 {schema}
