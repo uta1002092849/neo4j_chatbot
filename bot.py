@@ -1,30 +1,56 @@
 import streamlit as st
-from utils import write_message
 from agent import generate_response
+import time
 
-st.set_page_config("Text2Cypher", page_icon=":movie_camera:")
+# Page config and icon
+st.set_page_config("SOCKG Chat Bot", page_icon=":evergreen_tree:")
 
+
+# Initialize bot messages in session state
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Hi, I'm the sockg assitant bot!  How can I help you?"},
+        {"role": "assistant", "content": "Hi, I'm the sockg assistant bot! How can I help you?"},
     ]
 
-def handle_submit(message):
-
-    with st.spinner('Thinking...'):
-        
-        response = generate_response(message)
-
-        write_message('assistant', response)
-
-
-for message in st.session_state.messages:
-    write_message(message['role'], message['content'], save=False)
-
-if prompt := st.chat_input("What is up?"):
+# stream data
+def stream_data(sentences):
     
-    # Display user message in chat message container
-    write_message('user', prompt)
+    for word in sentences.split(" "):
+        yield word + " "
+        time.sleep(0.02)
 
-    # Generate a response
-    handle_submit(prompt)
+
+def reset_chat_history():
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Hi, I'm the sockg assistant bot! How can I help you?"},
+    ]
+    message_container.empty()
+
+with st.sidebar:
+    st.title("💬 Chatbot")
+
+    message_container = st.container(height=700)
+    for message in st.session_state.messages:
+        message_container.chat_message(message["role"], avatar="🐱" if message["role"] == "assistant" else "🤠").write(message["content"])
+    
+
+    if prompt_text := st.chat_input("What is up?"):
+        
+        # add user message to session state
+        user_prompt = {"role": "user", "content": prompt_text}
+        st.session_state.messages.append(user_prompt)
+        message_container.chat_message("user", avatar="🤠").write(prompt_text)
+        
+        # thinking spinner
+        with st.spinner("Thinking..."):
+            response_text = generate_response(prompt_text)
+
+        # add bot response to session state
+        bot_response = {"role": "assistant", "content": response_text}
+        st.session_state.messages.append(bot_response)
+        message_container.chat_message("user", avatar="🐱").write_stream(stream_data(response_text))
+
+    col1, col2 = st.columns([3.5, 1])
+    with col2:
+        # Clear chat history button
+        st.button("Reset", type="primary", on_click=reset_chat_history)
