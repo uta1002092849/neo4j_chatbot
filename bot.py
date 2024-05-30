@@ -14,7 +14,6 @@ if "messages" not in st.session_state:
 
 # stream data
 def stream_data(sentences):
-    
     for word in sentences.split(" "):
         yield word + " "
         time.sleep(0.02)
@@ -54,3 +53,20 @@ with st.sidebar:
     with col2:
         # Clear chat history button
         st.button("Reset", type="primary", on_click=reset_chat_history)
+
+
+# Main content
+field_tab, expUnit_tab, treatment_tab = st.tabs(["Fields", "Experimental Units", "Treatments"])
+
+
+with field_tab:
+    st.write("Fields")
+
+with expUnit_tab:
+    st.write("Experimental Units")
+
+with treatment_tab:
+    st.write("Treatments")
+
+
+
