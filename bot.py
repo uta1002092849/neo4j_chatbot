@@ -1,6 +1,16 @@
 import streamlit as st
 from agent import generate_response
 import time
+from api.neo4j import init_driver, close_driver
+from api.dao.experimentalUnit import ExperimentalUnitDAO
+from api.dao.field import FieldDAO
+
+# Initialize Neo4j driver
+uri = st.secrets["NEO4J_URI"]
+user = st.secrets["NEO4J_USERNAME"]
+password = st.secrets["NEO4J_PASSWORD"]
+driver = init_driver(uri, user, password)
+
 
 # Page config and icon
 st.set_page_config("SOCKG Chat Bot", page_icon=":evergreen_tree:")
@@ -61,6 +71,29 @@ field_tab, expUnit_tab, treatment_tab = st.tabs(["Fields", "Experimental Units",
 
 with field_tab:
     st.write("Fields")
+
+    # Get all fields from the database
+    field_dao = FieldDAO(driver)
+    fields = field_dao.get_all_ids()
+
+    option = st.selectbox("Select a field to explore:", fields)
+
+    # Get experimental unit data
+    exp_units = field_dao.get_all_experimental_unit(option)
+    st.write("Total experimental units:", len(exp_units))
+
+    # print out a table of experimental units
+    st.dataframe(exp_units)
+    
+    # Get latitude and longitude of the selected field
+    df = field_dao.get_lat_long_dataframe(option)
+    
+    # map
+    st.map(df, latitude='latitude', longitude='longitude')
+
+    # get rainfall data
+    rainfall_df = field_dao.get_rainfall_df(option)
+    st.bar_chart(rainfall_df, x='period', y='totalPrecipitation')
 
 with expUnit_tab:
     st.write("Experimental Units")
