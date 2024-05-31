@@ -81,7 +81,7 @@ def generate_response(prompt):
         response = agent_executor.invoke({"input": prompt})
     except Exception as e:
         response = {
-            'output': f"Opps! Something went wrong, I'm still in learning phase. Please try something else."
+            'output': f"Sorry, some error occurred and I could not process your request. Please try again later."
         }
 
     return response['output']
