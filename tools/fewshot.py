@@ -28,6 +28,25 @@ RETURN u.expUnit_UID, (c.totalSoilCarbon) as averageSoilCarbonForTargetedUnit
 MATCH (u:ExperimentalUnit)
 RETURN count(u) as totalNumberOfExperimentalUnits
 
+3. How to compute the precipitation for a specific field over Q1, Q2, Q3, Q4?
+MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation)
+WHERE f.fieldId = $neodash_field_fieldid_5
+WITH w.weatherObservationDate AS date, w.precipitation AS precipitation
+WITH date, precipitation,
+     toInteger(substring(date, 0, 4)) AS year,
+     toInteger(substring(date, 5, 2)) AS month
+WITH year,
+     CASE
+         WHEN month IN [1, 2, 3] THEN 'Q1'
+         WHEN month IN [4, 5, 6] THEN 'Q2'
+         WHEN month IN [7, 8, 9] THEN 'Q3'
+         ELSE 'Q4'
+     END AS quarter,
+     precipitation
+WITH year + '-' + quarter AS period, SUM(precipitation) AS totalPrecipitation
+RETURN period, round(totalPrecipitation, 3) AS totalPrecipitation
+ORDER BY period
+
 Schema:
 {schema}
 
