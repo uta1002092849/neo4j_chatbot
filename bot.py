@@ -140,10 +140,9 @@ with text2cypher:
         st.dataframe(data=st.session_state.query_result, hide_index=False)
 
         # Inner input for visualization query
-        viz_query = st.text_area("Do you want to visualize the data?")
+        viz_query = st.text_area("Do you want to visualize the data? (Ask something like show me a bar chart of ...)")
         if st.button("Visualize"):
             with st.spinner("Thinking..."):
-                
                 try:
                     sdf = SmartDataframe(
                         st.session_state.query_result,
