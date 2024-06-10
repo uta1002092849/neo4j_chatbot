@@ -4,7 +4,9 @@ def init_driver(uri, user, password):
 
     driver =  GraphDatabase.driver(uri, auth=(user, password))
 
+    
     driver.verify_connectivity()
+
 
     return driver
 
