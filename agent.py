@@ -3,7 +3,7 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain import PromptTemplate
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 
-from llm import llm
+from llm import gemini_pro
 
 from tools.fewshot import cypher_qa
 
@@ -11,7 +11,7 @@ tools = [
     Tool.from_function (
         name = "General Chat",
         description = "For general chat that not covered by other tools",
-        func = llm.invoke,
+        func = gemini_pro.invoke,
         return_direct = True
     ),
     
@@ -68,7 +68,7 @@ New input: {input}
 {agent_scratchpad}
 """)
 
-agent = create_react_agent(llm, tools, agent_prompt)
+agent = create_react_agent(gemini_pro, tools, agent_prompt)
 agent_executor = AgentExecutor(
     agent=agent,
     tools=tools,
