@@ -1,7 +1,8 @@
 from langchain.chains import GraphCypherQAChain
 from langchain.prompts.prompt import PromptTemplate
 
-from llm import llm
+from llm import gemini_pro
+from llm import llama3
 from graph import graph
 
 
@@ -19,12 +20,12 @@ For example, never return count(u) as count, always return count(u) as totalNumb
 
 Example Cypher Statements:
 
-1. How to find average soil carbon?
+1. How to find average soil carbon for each experimental unit?
 MATCH (u:ExperimentalUnit)-[:hasChemSample]->(c:SoilChemicalSample)
 WHERE (c.totalSoilCarbon) IS NOT NULL AND NOT isNaN(c.totalSoilCarbon)
 RETURN u.expUnit_UID, (c.totalSoilCarbon) as averageSoilCarbonForTargetedUnit
 
-2. How to compute total number of experimental units?
+2. How to count total number of experimental units?
 MATCH (u:ExperimentalUnit)
 RETURN count(u) as totalNumberOfExperimentalUnits
 
@@ -56,7 +57,7 @@ Question:
 
 cypher_prompt = PromptTemplate.from_template(CYPHER_GENERATION_TEMPLATE)
 cypher_qa = GraphCypherQAChain.from_llm(
-    llm,
+    llama3,
     graph=graph,
     verbose=True,
     cypher_prompt=cypher_prompt
