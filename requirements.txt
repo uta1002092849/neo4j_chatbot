@@ -6,3 +6,5 @@ langchain-community == 0.2.1
 langchainhub == 0.1.17
 pandasai == 2.1.1
 pandas == 1.5.3
+ollama ==0.2.1
+langchain-chroma == 0.1.1
