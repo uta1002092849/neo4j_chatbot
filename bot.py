@@ -8,7 +8,8 @@ from text2cypher import generate_cypher
 from api.dao.general import GeneralDAO
 from pandasai import SmartDataframe
 
-from llm import llm
+
+from llm import gemini_pro
 
 # Initialize Neo4j driver
 uri = st.secrets["NEO4J_URI"]
@@ -147,7 +148,7 @@ with text2cypher:
                     sdf = SmartDataframe(
                         st.session_state.query_result,
                         config={
-                            "llm": llm,
+                            "llm": gemini_pro,
                         },
                     )
                     st.image(sdf.chat(viz_query))
