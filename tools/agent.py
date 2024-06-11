@@ -14,7 +14,6 @@ tools = [
         func = gemini_pro.invoke,
         return_direct = True
     ),
-    
     Tool.from_function (
         name = "Cypher QA",
         description="Provides information about SOCKG database, including Experimental Units, Soil Samples, and more.",

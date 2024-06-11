@@ -7,8 +7,8 @@ from templates.examples import examples
 from templates.prefix_prompt import prefix_prompt
 from models.llms import gemini_pro
 from neo4j_connector.graph import neo4j_graph
-
 from models.embeddings import llama3_embeddings
+
 
 
 example_prompt = PromptTemplate.from_template(
@@ -48,18 +48,11 @@ def generate_cypher(prompt_text):
     except Exception as e:
         response = {"result": "Sorry, I can only answer questions related to the sockg dataset"}
     
-    # try one more time if 'intermediate_steps' is not in response
-    if 'intermediate_steps' not in response:
-        try:
-            response = chain.invoke({"query":prompt_text})
-        except Exception as e:
-            response = {"result": "Sorry, I can only answer questions related to the sockg dataset"}
-    
     # check if intermediate steps are present in response
     if 'intermediate_steps' not in response:
         raise Exception("Sorry, I could not process your request. Please try to rephrase your question or try again later.")
+    
     constructed_cypher = response['intermediate_steps'][0]['query']
     constructed_context = response['intermediate_steps'][1]['context']
     final_response = response['result']
-    
     return {"constructed_cypher": constructed_cypher, "constructed_context": constructed_context, "final_response": final_response}
