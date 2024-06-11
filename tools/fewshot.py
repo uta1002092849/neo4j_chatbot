@@ -1,9 +1,9 @@
 from langchain.chains import GraphCypherQAChain
 from langchain.prompts.prompt import PromptTemplate
 
-from llm import gemini_pro
-from llm import llama3
-from graph import graph
+from models.llms import gemini_pro
+from models.llms import llama3
+from neo4j_connector.graph import neo4j_graph
 
 
 CYPHER_GENERATION_TEMPLATE = """
@@ -58,7 +58,7 @@ Question:
 cypher_prompt = PromptTemplate.from_template(CYPHER_GENERATION_TEMPLATE)
 cypher_qa = GraphCypherQAChain.from_llm(
     llama3,
-    graph=graph,
+    graph=neo4j_graph,
     verbose=True,
     cypher_prompt=cypher_prompt
 )

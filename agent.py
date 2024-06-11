@@ -3,7 +3,7 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain import PromptTemplate
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 
-from llm import gemini_pro
+from models.llms import gemini_pro
 
 from tools.fewshot import cypher_qa
 

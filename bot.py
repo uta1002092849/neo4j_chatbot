@@ -9,7 +9,7 @@ from api.dao.general import GeneralDAO
 from pandasai import SmartDataframe
 
 
-from llm import gemini_pro
+from models.llms import gemini_pro
 
 # Initialize Neo4j driver
 uri = st.secrets["NEO4J_URI"]
