@@ -1,0 +1,54 @@
+{
+  "Return a list of all fields  and their average precipitation": [
+    [
+      "MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation)\nWITH f.fieldId AS fieldId, f.fieldLatitude AS latitude, f.fieldLongitude AS longitude, AVG(w.precipitation) AS avgPrecipitation\nRETURN fieldId, latitude, longitude, avgPrecipitation",
+      "up"
+    ],
+    [
+      "MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation)\nRETURN f.fieldId,AVG(w.precipitation)",
+      "up"
+    ],
+    [
+      "MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation)\nWHERE (w.precipitation) IS NOT NULL AND NOT isNaN(w.precipitation)\nRETURN f.fieldId AS fieldId, ROUND(AVG(w.precipitation),2) AS averagePrecipitation",
+      "up"
+    ]
+  ],
+  "Return all experimental unit": [
+    [
+      "MATCH (u:ExperimentalUnit) RETURN u.expUnit_UID AS Experimental_unit",
+      "up"
+    ]
+  ],
+  "Return all experimental units and their attributes": [
+    [
+      "MATCH (u:ExperimentalUnit) RETURN u.expUnit_UID AS Experimental_unit, u.expUnitStartDate AS Experimental_unit_start_date, u.expUnitEndDate AS Experimental_unit_end_date, u.expUnitSize AS Experimental_unit_size, u.fieldSlopePercent AS Experimental_unit_field_slope_percent, u.landscapePosition AS Experimental_unit_landscape_position, u.expUnitChangeInManagement AS Experimental_unit_change_in_management",
+      "up"
+    ]
+  ],
+  "Return all field and their corresponding precipitation": [
+    [
+      "MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation)\nWITH f.fieldId AS fieldId, w.precipitation AS precipitation\nRETURN fieldId, precipitation",
+      "down"
+    ],
+    [
+      "MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation) RETURN f.fieldId, w.precipitation",
+      "down"
+    ],
+    [
+      "MATCH (f:Field)<-[:weatherAtField]-(w:WeatherObservation)\nRETURN f.fieldId, w.precipitation",
+      "down"
+    ]
+  ],
+  "Return all fields": [
+    [
+      "MATCH (f:Field) RETURN f.fieldId",
+      "up"
+    ]
+  ],
+  "Return all fields and their corresponding attribute": [
+    [
+      "MATCH (f:Field) RETURN f.fieldId, f.fieldLatitude, f.fieldLongitude, f.fieldElevation",
+      "down"
+    ]
+  ]
+}
