@@ -39,19 +39,3 @@ def field_tab_component(driver):
         st.bar_chart(rainfall_df, x='period', y='totalPrecipitation')
     else:
         st.write("No rainfall data available.")
-
-    # Custom CSS for styling
-    st.markdown("""
-        <style>
-        .stApp {
-            max-width: 1200px;
-            margin: auto;
-        }
-        .stHeader {
-            text-align: center;
-        }
-        .stDataframe, .stTable {
-            margin-top: 20px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
