@@ -1,6 +1,6 @@
 from langchain.tools import Tool
 from langchain.agents import AgentExecutor, create_react_agent
-from langchain import PromptTemplate
+from langchain.prompts import PromptTemplate
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 
 from models.llms import gemini_pro
