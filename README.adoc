@@ -1,14 +1,31 @@
-= Build an Neo4j-backed Chatbot using Python
-Python: 3.10.13
+# Project Name
+SOCKG DashBoard
 
-== Running the application
+Short description of the project.
 
-To run the application, you must install the libraries listed in `requirements.txt`.
+## Table of Contents
 
-[source,sh]
-pip install -r requirements.txt
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-Then run the `streamlit run` command to start the app on link:http://localhost:8501/[http://localhost:8501/^].
+## Installation
 
-[source,sh]
-streamlit run bot.py
+Instructions on how to install and set up the project.
+
+## Usage
+
+Instructions on how to use the project and any relevant examples.
+
+## Contributing
+
+Guidelines on how to contribute to the project, including information on coding standards, pull requests, and issue tracking.
+
+## License
+
+Information about the project's license and any relevant terms or conditions.
+
+## Python Version
+
+This project requires Python version X.X.X. Make sure you have Python installed before proceeding with the installation steps.
