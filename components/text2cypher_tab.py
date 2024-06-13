@@ -4,7 +4,6 @@ from api.dao.general import GeneralDAO
 from tools.rating import save_ratings
 
 def text2cypher_component(driver, gemini_pro):
-    
     state = st.session_state
     
     def upvote_callback():
@@ -19,14 +18,12 @@ def text2cypher_component(driver, gemini_pro):
         if key not in state:
             state[key] = value
     
-    # generic callback to set state
     def _set_state_cb(**kwargs):
         for state_key, widget_key in kwargs.items():
             val = state.get(widget_key, None)
             if val is not None or val == "":
                 setattr(state, state_key, state[widget_key])
         
-    # initialize state
     init_state('cypher_code', None)
     init_state('query_result', None)
     init_state('user_input', None)
@@ -38,49 +35,70 @@ def text2cypher_component(driver, gemini_pro):
         state['rated'] = False
         state['cypher_code'] = None
         state['query_result'] = None
-            
 
-    # Main input for text2cypher model
-    st.write("Text2Cypher")
-    st.write("This is a text2cypher model that generates cypher queries based on natural language input.")
-    st.write("Example: Return all experimental units?")
+    st.header("Text to Cypher Conversion")
+    st.subheader("Query the knowledge graph using natural language!")
+
+    tutorial_col, tips_col = st.columns([1,1])
+
+    with tutorial_col:
+        with st.expander("How it works", expanded=False):
+            st.write("""
+            1. Enter your query in natural language.
+            2. Click 'Generate' to create the corresponding Cypher query.
+            3. The generated Cypher code will automatically run against our database.
+            4. The generated Cypher code and query results will be returned.
+            5. (Optional) Rate the response to help us improve! (Only the quality of the answer (thumbs up or down) is stored).
+            """)
+            st.write("**Example**: Return all Fields. For each field, return the name and the number of Experimental Units it has.")
     
-    # Use the session state for the text input
+    with tips_col:
+        with st.expander("Prompts Tips", expanded=False):
+            st.write("""
+            1. Be clear and specific in your query. Provide detailed descriptions of the data you want to retrieve, closely matching the node labels, relationships, and property values.
+            2. Use declarative language sometime give better result than asking questions. Start with phrases like "Show me a list of..." or "Return all...".
+            3. Ask precise questions. For example, instead of "Return all fields," try "Return all fields and their respective longitudes and latitudes."
+            4. Avoid ambiguous questions that are not related to the database.
+            """)
+
+
     st.text_input(
-        "Query: ", value=state.user_input, key='user_input',
+        "Enter your query:", value=state.user_input, key='user_input',
         on_change=_set_state_cb, kwargs={'user_input': 'user_input'}
     )
 
-    st.button(
-        "Generate", on_click=_set_run_query_cb, args=()
-    )
+    generate_col, _ = st.columns([1,4])
+    with generate_col:
+        st.button(
+            "🔄 Generate", type="primary", on_click=_set_run_query_cb, args=()
+        )
     
     if state['run_query']:
-        with st.spinner("Generating Cypher..."):
+        with st.spinner("🔧 Generating Cypher..."):
             try:
                 response = generate_cypher(state['user_input'])
                 state['cypher_code'] = response['constructed_cypher']
                 state['run_query'] = False
             except Exception as e:
-                st.error(f"An error occurred: {e}")
+                st.error(f"❌ An error occurred: {e}")
+                state['run_query'] = False
     
-    # Update the session state when the input changes
     if state['cypher_code']:
-        # display the cypher code
+        st.subheader("Generated Cypher Code")
         st.code(state['cypher_code'], language='cypher')
         
-        # display query result
+        st.subheader("Query Result")
         general_dao = GeneralDAO(driver)
         query_result = general_dao.run_query(state['cypher_code'])
-        st.dataframe(data=query_result, hide_index=False)
+        st.dataframe(data=query_result, hide_index=False, use_container_width=True)
         
-    if not state['rated'] and state['cypher_code']:
-        st.write("Rate this response:")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.button("👍", key="upvote", on_click=upvote_callback)
-        with col2:
-            st.button("👎", key="downvote", on_click=downvote_callback)
+        if not state['rated']:
+            st.markdown("### Rate this response:")
+            col1, col2, _ = st.columns([1,1,4])
+            with col1:
+                st.button("👍 Upvote", key="upvote", on_click=upvote_callback)
+            with col2:
+                st.button("👎 Downvote", key="downvote", on_click=downvote_callback)
     
-    if state['rated'] and state['cypher_code']:
-        st.write("Thanks for your feedback!")
+        if state['rated']:
+            st.success("✅ Thanks for your feedback!")
