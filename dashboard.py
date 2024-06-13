@@ -11,7 +11,7 @@ from components.text2cypher_tab import text2cypher_component
 
 driver = init_driver()
 # Page config and icon
-st.set_page_config("SOCKG Chat Bot", page_icon=":evergreen_tree:")
+st.set_page_config(layout="wide", page_title="SOCKG Chat Bot", page_icon=":evergreen_tree:")
 
 
 # Initialize bot messages in session state
@@ -36,4 +36,5 @@ with treatment_tab:
     treatment_tab_component()
 
 with text2cypher:
+    st.write("Under construction...")
     text2cypher_component(driver, gemini_pro)
