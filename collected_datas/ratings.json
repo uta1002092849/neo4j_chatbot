@@ -73,6 +73,10 @@
     [
       "MATCH (f:Field)\nRETURN f.fieldId AS Field_id",
       "up"
+    ],
+    [
+      "MATCH (f:Field) RETURN f.fieldId AS Field_ID",
+      "up"
     ]
   ],
   "Return all research paper conducted on field NELITCSE": [
@@ -90,6 +94,10 @@
   "Return a list of experimental unit id": [
     [
       "MATCH (eu:ExperimentalUnit) RETURN eu.expUnit_UID",
+      "up"
+    ],
+    [
+      "MATCH (u:ExperimentalUnit) RETURN u.expUnit_UID as expUnit_UID",
       "up"
     ]
   ],
@@ -133,6 +141,48 @@
     [
       "MATCH (f:Field) RETURN f.fieldId AS Field_ID, f.fieldLatitude AS Field_Latitude, f.fieldLongitude AS Field_Longitude, f.fieldElevation AS Field_Elevation",
       "down"
+    ]
+  ],
+  "": [
+    [
+      "MATCH (p:Publication) RETURN p.publicationTitle AS Publication_Title, p.publicationAuthor AS Publication_Author, p.publicationDate AS Publication_Date, p.publicationIdentifier AS Publication_Reference",
+      "down"
+    ]
+  ],
+  "Return all Fields. For each field, return the name and the number of Experimental Units it has.": [
+    [
+      "cypher\nMATCH (f:Field)\nWITH f, f.fieldId AS fieldId\nOPTIONAL MATCH (u:ExperimentalUnit)-[:locatedInField]->(f)\nRETURN f.fieldId AS fieldName, count(u) AS numExpUnits\n",
+      "up"
+    ]
+  ],
+  "Return all fields and their respective longitudes and latitudes.": [
+    [
+      "MATCH (f:Field) RETURN f.fieldId AS FieldId, f.fieldLatitude AS Latitude, f.fieldLongitude AS Longitude",
+      "up"
+    ]
+  ],
+  "Return all Fields. For each field, return the name and the number of Experimental Units it has": [
+    [
+      "cypher\nMATCH (f:Field)\nWITH f, f.fieldId AS fieldId\nOPTIONAL MATCH (u:ExperimentalUnit)-[:locatedInField]->(f)\nRETURN f.fieldId AS fieldName, count(u) AS numExpUnits\n",
+      "up"
+    ]
+  ],
+  "Return all Fields": [
+    [
+      "MATCH (f:Field) RETURN f.fieldId AS FieldId",
+      "down"
+    ]
+  ],
+  "Return all Experimental Unit": [
+    [
+      "MATCH (u:ExperimentalUnit) RETURN u.expUnit_UID AS Experimental_Unit",
+      "down"
+    ]
+  ],
+  "Return all experimental unit with their corresponding field": [
+    [
+      "MATCH (u:ExperimentalUnit)-[:locatedInField]->(f:Field) RETURN u.expUnit_UID AS expUnit, f.fieldId AS fieldId",
+      "up"
     ]
   ]
 }
