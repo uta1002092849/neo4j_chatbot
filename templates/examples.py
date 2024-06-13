@@ -43,5 +43,12 @@ ORDER BY period"""
     {
         "question": "How get a list of research conducted on a specific filed?",
         "query": "MATCH path =(f:Field)<-[:hasField]-(s:Site)<-[:studiesSite]-(p:Publication) WHERE f.fieldId = $neodash_field_fieldid_5 RETURN p.publicationTitle as Title, p.publicationAuthor as Author, p.publicationDate as publicationDate, p.publicationIdentifier as Reference ORDER BY p.publicationDate"
-    }
+    },
+    {
+        "question": "Return all Fields. For each field, return the name and the number of Experimental Units it has.",
+        "query": """MATCH (f:Field)
+WITH f, f.fieldId AS fieldId
+OPTIONAL MATCH (u:ExperimentalUnit)-[:locatedInField]->(f)
+RETURN f.fieldId AS fieldName, count(u) AS numExpUnits"""
+    },
 ]
