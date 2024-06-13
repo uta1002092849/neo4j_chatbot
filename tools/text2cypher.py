@@ -51,7 +51,7 @@ def generate_cypher(prompt_text):
         except Exception as e:
             attempt -= 1
             if attempt == 0:
-                raise Exception("Sorry, I could not process your request. Please try to rephrase your question or try again later.")
+                raise Exception("Sorry, I could not process your request. Please rephrase your promp using Prompts Tips or try again later.")
     
     # check if intermediate steps are present in response
     if 'intermediate_steps' not in response:
