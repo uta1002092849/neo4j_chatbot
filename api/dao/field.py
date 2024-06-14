@@ -8,14 +8,14 @@ class FieldDAO:
     # get the unique ID of all experimental units
     def get_all_ids(self):
         # transaction function
-        def get_exp_units(tx):
+        def get_fiel_ids(tx):
             cypher = "MATCH (f:Field) RETURN f as field"
             result = tx.run(cypher)
             return [record["field"]['fieldId'] for record in result]
         
         # execute transaction
         with self.driver.session() as session:
-            return session.execute_read(get_exp_units)
+            return session.execute_read(get_fiel_ids)
     
     
     # get latitude and longitude of a field
@@ -71,8 +71,8 @@ class FieldDAO:
         with self.driver.session() as session:
             date, precipitation = session.execute_read(get_rainfall)
             df = pd.DataFrame({
-                'period': date,
-                'totalPrecipitation': precipitation
+                'Period': date,
+                'TotalPrecipitation': precipitation
             })
             return df
             
@@ -83,12 +83,39 @@ class FieldDAO:
             cypher = """MATCH (f:Field {fieldId: $field_id})<-[:locatedInField]-(u:ExperimentalUnit)
                         RETURN u.expUnit_UID as id"""
             result = tx.run(cypher, field_id=field_id)
-            return [record["id"] for record in result]
+            return result.to_df()
+        # execute transaction
+        with self.driver.session() as session:
+            return session.execute_read(get_exp_units)
+    
+    
+    # get all publications related to a field
+    def get_publications(self, field_id):
+        # transaction function
+        def get_publications(tx):
+            cypher = """MATCH path =(f:Field {fieldId: $field_id})<-[:hasField]-(s:Site)<-[:studiesSite]-(p:Publication)
+RETURN p.publicationTitle as Title,
+p.publicationAuthor as Author,
+p.publicationDate as publicationDate,
+p.publicationIdentifier as Reference
+ORDER BY p.publicationDate"""
+            result = tx.run(cypher, field_id=field_id)
+            return result.to_df()
+        # execute transaction
+        with self.driver.session() as session:
+            return session.execute_read(get_publications)
+    
+    # get soil description of a field
+    def get_soil_description(self, field_id):
+        # transaction function
+        def get_soil_description(tx):
+            cypher = """MATCH (f:Field {fieldId: $field_id})<-[:appliedInField]-(s:Soil) RETURN s.soilSeries as Soil_Series"""
+            result = tx.run(cypher, field_id=field_id)
+            return result.single()
         
         # execute transaction
         with self.driver.session() as session:
-            fields =  session.execute_read(get_exp_units)
-
-            # create df
-            df = pd.DataFrame(fields)
-            return df
+            result = session.execute_read(get_soil_description)
+            soil_series = result['Soil_Series']
+            return soil_series
+            

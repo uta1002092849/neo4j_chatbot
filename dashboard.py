@@ -23,18 +23,17 @@ if "messages" not in st.session_state:
 sidebar_chatbot()
 
 # Main content
-field_tab, expUnit_tab, treatment_tab, text2cypher = st.tabs(["Fields", "Experimental Units", "Treatments", "Text2Cypher"])
+field_tab, expUnit_tab, text2cypher = st.tabs(["Fields", "Experimental Units", "Text2Cypher"])
 
 
 with field_tab:
     field_tab_component(driver)
 
 with expUnit_tab:
-    expUnit_tab_component()
+    expUnit_tab_component(driver)
 
-with treatment_tab:
-    treatment_tab_component()
+# with treatment_tab:
+#     treatment_tab_component(driver)
 
 with text2cypher:
-    st.write("Under construction...")
     text2cypher_component(driver, gemini_pro)

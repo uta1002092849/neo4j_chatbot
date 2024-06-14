@@ -1,5 +1,0 @@
-tasks:
-  - init: >
-      pyenv install --force 3.10.14 &&
-      pyenv global 3.10.14 &&
-      pip install -r requirements.txt

@@ -10,5 +10,5 @@ driver = init_driver(uri, user, password)
 
 def test_all_exp_units():
     dao = ExperimentalUnitDAO(driver)
-    all_exp_units = dao.all()
+    all_exp_units = dao.get_all_ids()
     assert len(all_exp_units) > 0

@@ -28,4 +28,4 @@ Information about the project's license and any relevant terms or conditions.
 
 ## Python Version
 
-This project requires Python version X.X.X. Make sure you have Python installed before proceeding with the installation steps.
+This project built using Python version 3.10.14. Make sure you have Python installed before proceeding with the installation steps.

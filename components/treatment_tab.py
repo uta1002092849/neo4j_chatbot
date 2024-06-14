@@ -1,6 +1,6 @@
 import streamlit as st
 
-def treatment_tab_component():
+def treatment_tab_component(driver):
     st.header("Treatment Options")
     st.subheader("Explore various treatment methods")
 
