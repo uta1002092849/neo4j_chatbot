@@ -9,11 +9,16 @@ services:
       - "8501:8501"
     depends_on:
       - llama3
-    command: 
-      ["streamlit", "run", "dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    command:
+      [
+        "streamlit",
+        "run",
+        "dashboard.py",
+        "--server.port=8501"
+      ]
     networks:
       - llama3-network
-  
+
   llama3:
     image: langchain4j/ollama-llama3
     ports:
@@ -21,6 +26,10 @@ services:
     networks:
       - llama3-network
     container_name: llama3
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
 
 networks:
   llama3-network:
