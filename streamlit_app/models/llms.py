@@ -8,5 +8,6 @@ gemini_pro = GoogleGenerativeAI(
 )
 
 llama3 = Ollama(
+    base_url='http://host.docker.internal:11434',
     model="llama3",
 )
