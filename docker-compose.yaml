@@ -21,8 +21,8 @@ services:
 
   llama3:
     image: langchain4j/ollama-llama3
-    ports:
-      - "11434:11434"
+    # ports:
+    #   - "11434:11434"
     networks:
       - llama3-network
     container_name: llama3
