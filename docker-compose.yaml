@@ -16,13 +16,13 @@ services:
         "dashboard.py",
         "--server.port=8501"
       ]
+    container_name: streamlit_app
     networks:
       - llama3-network
+    restart: always
 
   llama3:
     image: langchain4j/ollama-llama3
-    # ports:
-    #   - "11434:11434"
     networks:
       - llama3-network
     container_name: llama3
