@@ -118,4 +118,37 @@ ORDER BY p.publicationDate"""
             result = session.execute_read(get_soil_description)
             soil_series = result['Soil_Series']
             return soil_series
-            
+    
+    # get some extra information of a field from site
+    def get_field_info(self, field_id):
+        # transaction function
+        def get_field_info(tx):
+            cypher = """MATCH (f:Field {fieldId: $field_id})<-[:hasField]-(s:Site)
+                        RETURN
+                            s.majorLandResourceArea as Major_Land_Resource_Area,
+                            s.postalCodeNumber as Postal_Code,
+                            s.siteDate as establishedDate,
+                            s.siteHistory as History,
+                            s.siteIdDescription as Description,
+                            s.siteNativeVegetation as Native_Vegetation,
+                            s.siteSpatialDescription as Spatial_Description"""
+            result = tx.run(cypher, field_id=field_id)
+            return result.to_df()
+        
+        # execute transaction
+        with self.driver.session() as session:
+            return session.execute_read(get_field_info)
+    
+    
+    # get weather station information of a field
+    def get_weather_station(self, field_id):
+        # transaction function
+        def get_weather_station(tx):
+            cypher = """MATCH (f:Field {fieldId: $field_id})<-[:recordsWeatherForField]-(w:WeatherStation)
+                        RETURN w.weatherStationId as Weather_Station_ID"""
+            result = tx.run(cypher, field_id=field_id)
+            return result.to_df()
+        
+        # execute transaction
+        with self.driver.session() as session:
+            return session.execute_read(get_weather_station)

@@ -13,8 +13,21 @@ def field_tab_component(driver):
     if not ids:
         st.error("No fields found in the database.")
         return
+
     # Field selection
     option = st.selectbox("Select a field to explore:", ids)
+    
+    # get field extra information
+    field_info = field_dao.get_field_info(option)
+    st.info(f"""
+        **Major Land Resource Area:** {field_info['Major_Land_Resource_Area'][0]}\n
+        **Postal Code:** {field_info['Postal_Code'][0]}\n
+        **Established Date:** {field_info['establishedDate'][0]}\n
+        **History:** {field_info['History'][0]}\n
+        **Description:** {field_info['Description'][0]}\n
+        **Native Vegetation:** {field_info['Native_Vegetation'][0]}\n
+        **Spatial Description:** {field_info['Spatial_Description'][0]}
+        """)
     
     # Column layout
     col1, col2 = st.columns(2)
