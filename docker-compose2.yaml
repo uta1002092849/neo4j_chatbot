@@ -17,7 +17,8 @@ services:
     # ports:
     #   - "8501:8501"
     networks:
-      - llama3-network
+      llama3-network:
+        ipv4_address: 172.20.0.3
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -35,7 +36,7 @@ services:
       context: .
       dockerfile: Dockerfile-apache
     ports:
-      - "40:80"
+      - "8457:80"
     volumes:
       - ./apache-config:/usr/local/apache2/conf/extra/
     container_name: apache_webserver
@@ -49,3 +50,8 @@ services:
 networks:
   llama3-network:
     name: llama3-network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
