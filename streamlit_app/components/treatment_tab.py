@@ -54,7 +54,29 @@ def treatment_tab_component(driver):
         st.write("No treatments found.")
     else:
         st.info(f"Number of treatments found: {filtered_treatments.shape[0]}")
+        # Rename columns for better display
+        filtered_treatments.rename(columns={
+            "Id": "Treatment ID",
+            "description": "Description",
+            "Start_Date": "Start Date",
+            "End_Date": "End Date"
+        }, inplace=True)
         st.dataframe(filtered_treatments, use_container_width=True)
-        selected_treatment = st.selectbox("Select a treatment to explore:", filtered_treatments['ID'])
-        st.write(f"Selected treatment: {selected_treatment}")
+        selected_treatment = st.selectbox("Select a treatment from the table above to explore:", filtered_treatments['ID'])
         
+        # Get all experimental units that belong to a treatment 
+        expUnits = treatment_dao.get_all_expUnit(selected_treatment)
+
+        # Dislay number of experimental units belong to the selected treatment
+        if expUnits.empty:
+            st.write("No experimental units found.")
+        else:
+            st.info(f"Number of experimental units found for {selected_treatment} is: {expUnits.shape[0]}")
+            # Rename columns for better display
+            expUnits.rename(columns={
+                "ID": "Experimental Unit ID",
+                "description": "Description",
+                "Start_Date": "Start Date",
+                "End_Date": "End Date"
+            }, inplace=True)
+            st.dataframe(expUnits, use_container_width=True)

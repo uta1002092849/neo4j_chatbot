@@ -11,7 +11,7 @@ from components.treatment_tab import treatment_tab_component
 from components.weatherStation_tab import weatherStation_tab_component
 
 # Page config and icon
-st.set_page_config(layout="wide", page_title="SOCKG Chat Bot", page_icon=":evergreen_tree:")
+st.set_page_config(layout="wide", page_title="SOCKG Dashboard", page_icon=":seedling:")
 
 # hide hamburger menu, deploy button, and footer
 st.markdown("""

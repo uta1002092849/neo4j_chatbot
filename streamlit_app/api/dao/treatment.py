@@ -3,6 +3,7 @@ class TreatmentDAO:
     def __init__(self, driver):
         self.driver = driver
 
+    # get all treatments that sastified filter
     def get_filtered_treatments(self, selected_tillage, selected_rotation, belong_to_experiment, selected_nitrogen, selected_irrigation, selected_residue_removal, treatment_organic_management):
         
         def get_treatments(tx):
@@ -39,6 +40,32 @@ class TreatmentDAO:
         
         with self.driver.session() as session:
             dataframe =  session.execute_read(get_treatments)
+            # convert end date to 'Present' if it is null
+            dataframe['End_Date'] = dataframe['End_Date'].apply(lambda x: 'Present' if pd.isnull(x) else x)
+            return dataframe
+    
+
+    # get all experimental units that belong to a treatment
+    def get_all_expUnit(self, treatmentId):
+        def get_expUnits(tx):
+            cypher = """
+            MATCH (treatment:Treatment {treatmentId: $treatmentId})-[:appliedInExpUnit]->(expUnit:ExperimentalUnit)
+            RETURN 
+                expUnit.expUnit_UID AS ID,
+                expUnit.expUnitChangeInManagement AS description,
+                expUnit.expUnitStartDate AS Start_Date,
+                expUnit.expUnitEndDate AS End_Date
+            ORDER BY expUnit.expUnitDescriptor ASC
+            """
+            parameters = {
+                "treatmentId": treatmentId
+            }
+
+            result = tx.run(cypher, parameters)
+            return result.to_df()
+        
+        with self.driver.session() as session:
+            dataframe =  session.execute_read(get_expUnits)
             # convert end date to 'Present' if it is null
             dataframe['End_Date'] = dataframe['End_Date'].apply(lambda x: 'Present' if pd.isnull(x) else x)
             return dataframe
