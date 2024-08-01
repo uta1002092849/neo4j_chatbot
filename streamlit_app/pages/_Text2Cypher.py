@@ -3,19 +3,15 @@ from tools.text2cypher import generate_cypher
 from api.dao.general import GeneralDAO
 from tools.rating import save_ratings
 from api.neo4j import init_driver
-
+from components.navigation_bar import navition_bar
 driver = init_driver()
 state = st.session_state
 
+# Page config and icon
+st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Text2Cypher", page_icon=":keyboard:")
+
 # sidebar for navigation
-st.sidebar.title("Navigation")
-with st.sidebar:
-    st.page_link("dashboard.py", label="Home", icon="🏡")
-    st.page_link("pages/_Fields.py", label="Field Explorer", icon="🏞️")
-    st.page_link("pages/_ExperimentalUnits.py", label="Experimental Unit Explorer", icon="📐")
-    st.page_link("pages/_Treatments.py", label="Treatment Explorer", icon="💊")
-    st.page_link("pages/_WeatherStations.py", label="Weather Station Explorer", icon="🌡️")
-    st.page_link("pages/_Text2Cypher.py", label="Text2Cypher", icon="⌨️")
+navition_bar()
 
 def upvote_callback():
     save_ratings(state['user_input'], state['cypher_code'], "up")

@@ -1,23 +1,17 @@
 from api.neo4j import init_driver
 import streamlit as st
 from api.dao.treatment import TreatmentDAO
+import pandas as pd
+from components.navigation_bar import navition_bar
 
 # Page config and icon
-st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Treatments", page_icon=":seedling:")
+st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Treatments", page_icon=":pill:")
 
 # sidebar for navigation
-st.sidebar.title("Navigation")
-with st.sidebar:
-    st.page_link("dashboard.py", label="Home", icon="🏡")
-    st.page_link("pages/_Fields.py", label="Field Explorer", icon="🏞️")
-    st.page_link("pages/_ExperimentalUnits.py", label="Experimental Unit Explorer", icon="📐")
-    st.page_link("pages/_Treatments.py", label="Treatment Explorer", icon="💊")
-    st.page_link("pages/_WeatherStations.py", label="Weather Station Explorer", icon="🌡️")
-    st.page_link("pages/_Text2Cypher.py", label="Text2Cypher", icon="⌨️")
+navition_bar()
 
 # Initialize driver
 driver = init_driver()
-
 st.title("Treatment Exploration:")
 
 col1, col2 = st.columns(2)
@@ -25,11 +19,11 @@ with col1:
     # Tillage and Residue Management
     tillage_options = ["All", "Conventional Till", "Conservation Till", "No Till", "Not Reported", "Sub Till"]
     tillage_help_text = "Tillage is the mechanical preparation of soil for planting and cultivation after planting. Choose 'All' to see all tillage types."
-    selected_tillage = st.selectbox("Tillage Descriptor", tillage_options, help=tillage_help_text)
+    selected_tillage = st.selectbox("Tillage Descriptor", tillage_options, help=tillage_help_text, index=None)
     
     residue_removal_options = ["All", "No", "Partial", "Yes"]
     residue_removal_help_text = "Residue removal is the process of removing crop remnants, such as leaves, stalks, and roots, from a field after harvest. Choose 'All' to see all residue removal types."
-    selected_residue_removal = st.selectbox("Residue Removal", residue_removal_options, help=residue_removal_help_text)
+    selected_residue_removal = st.selectbox("Residue Removal", residue_removal_options, help=residue_removal_help_text, index=None)
 
 with col2:
     # Nutrient Management
@@ -38,7 +32,7 @@ with col2:
         "120 kgN/ha (N3)", "125 kg N/ha/y", "168 kg N/ha", "180 kgN/ha (N4)", "200 kg N/ha/y",
         "202 kg N/ha", "High N", "Low N"
     ]
-    selected_nitrogen = st.selectbox("Nitrogen Amount", nitrogen_options)
+    selected_nitrogen = st.selectbox("Nitrogen Amount", nitrogen_options, index=None)
     
     # Crop Management
     rotation_options = [
@@ -46,7 +40,7 @@ with col2:
         "Soybean", "Soybean, Corn", "Soybean, Sorghum", "Sorghum", "Switchgrass"
     ]
     rotation_help_text = "Crop rotation is the practice of planting different crops in the same field over time. Choose 'All' to see all crop rotations."
-    selected_rotation = st.selectbox("Rotation", rotation_options, help=rotation_help_text)
+    selected_rotation = st.selectbox("Rotation", rotation_options, help=rotation_help_text, index=None)
 
 # Second row of columns
 col3, col4, col5 = st.columns(3)
@@ -65,29 +59,55 @@ with col5:
 treatment_dao = TreatmentDAO(driver)
 filtered_treatments = treatment_dao.get_filtered_treatments(selected_tillage, selected_rotation, belong_to_experiment, selected_nitrogen, selected_irrigation, selected_residue_removal, treatment_organic_management)
 
+# initialize filtered treatments to an empty dataframe if not already initialized
+if 'filtered_treatments' not in st.session_state:
+    st.session_state.filtered_treatments = pd.DataFrame()
+
 # select treatment
-if filtered_treatments.empty:
+if filtered_treatments.empty and st.session_state.filtered_treatments.empty:
     st.write("No treatments found.")
+    st.stop()
 else:
-    st.info(f"Number of treatments found: {filtered_treatments.shape[0]}")
+    # Save the filtered treatments to a session state
+    if not filtered_treatments.empty:
+        st.session_state.filtered_treatments = filtered_treatments
+
+    # Display number of treatments found
+    st.info(f"Number of treatments found: {st.session_state.filtered_treatments.shape[0]}")
     # Rename columns for better display
-    filtered_treatments.rename(columns={
+    st.session_state.filtered_treatments.rename(columns={
         "Id": "Treatment ID",
         "description": "Description",
         "Start_Date": "Start Date",
         "End_Date": "End Date"
     }, inplace=True)
-    st.dataframe(filtered_treatments, use_container_width=True)
-    selected_treatment = st.selectbox("Select a treatment from the table above to explore:", filtered_treatments['ID'])
+
+    st.dataframe(
+        st.session_state.filtered_treatments,
+        use_container_width=True,
+        hide_index=False
+    )
+
+    # initialize selected treatment in session state if not already initialized
+    if 'selected_treatment' not in st.session_state:
+        st.session_state.selected_treatment = None
+
+    option = st.selectbox("Select a treatment from the table above to explore:", st.session_state.filtered_treatments['ID'], index=None)
+    if option is not None:
+        st.session_state['selected_treatment'] = option
     
+    # If no treatment is selected, stop the script
+    if st.session_state.selected_treatment is None:
+        st.stop()
+
     # Get all experimental units that belong to a treatment 
-    expUnits = treatment_dao.get_all_expUnit(selected_treatment)
+    expUnits = treatment_dao.get_all_expUnit(st.session_state.selected_treatment)
 
     # Dislay number of experimental units belong to the selected treatment
     if expUnits.empty:
         st.write("No experimental units found.")
     else:
-        st.info(f"Number of experimental units found for {selected_treatment} is: {expUnits.shape[0]}")
+        st.info(f"Number of experimental units found for {st.session_state.selected_treatment} is: {expUnits.shape[0]}")
         # Rename columns for better display
         expUnits.rename(columns={
             "ID": "Experimental Unit ID",
@@ -95,4 +115,18 @@ else:
             "Start_Date": "Start Date",
             "End_Date": "End Date"
         }, inplace=True)
-        st.dataframe(expUnits, use_container_width=True)
+        event = st.dataframe(
+            expUnits, 
+            use_container_width=True,
+            hide_index=True,
+            on_select='rerun',
+            selection_mode='single-row',
+            )
+
+        # get the experimental unit id of the selected row
+        selected_row = event.selection.rows
+        if selected_row:
+            st.session_state.selected_exp_unit = expUnits.loc[selected_row[0], "Experimental Unit ID"]
+            # jump to the experimental unit page
+            st.switch_page("pages/_ExperimentalUnits.py")
+

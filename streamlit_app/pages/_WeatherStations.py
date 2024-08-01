@@ -2,20 +2,14 @@ from api.neo4j import init_driver
 import streamlit as st
 from api.dao.weatherStation import weatherStationDAO
 import pandas as pd
+from components.navigation_bar import navition_bar
 
 driver = init_driver()
 # Page config and icon
-st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Weather Station", page_icon=":seedling:")
+st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Weather Station", page_icon=":thermometer:")
 
 # sidebar for navigation
-st.sidebar.title("Navigation")
-with st.sidebar:
-    st.page_link("dashboard.py", label="Home", icon="🏡")
-    st.page_link("pages/_Fields.py", label="Field Explorer", icon="🏞️")
-    st.page_link("pages/_ExperimentalUnits.py", label="Experimental Unit Explorer", icon="📐")
-    st.page_link("pages/_Treatments.py", label="Treatment Explorer", icon="💊")
-    st.page_link("pages/_WeatherStations.py", label="Weather Station Explorer", icon="🌡️")
-    st.page_link("pages/_Text2Cypher.py", label="Text2Cypher", icon="⌨️")
+navition_bar()
 
 # Custom CSS to improve appearance
 st.markdown("""
@@ -46,16 +40,26 @@ if not ids:
 
 # Weather station selection (original box choice)
 st.markdown('<p class="medium-font">Select Weather Station</p>', unsafe_allow_html=True)
-option = st.selectbox("Choose a weather station to explore:", ids)
+
+# Initialize selected weather station in session state if not already initialized
+if 'selected_weather_station' not in st.session_state:
+    st.session_state.selected_weather_station = None
+
+option = st.selectbox("Choose a weather station to explore:", ids, index=None)
+st.session_state.selected_weather_station = option
+
+# stop the script if no weather station is selected
+if st.session_state.selected_weather_station is None:
+    st.stop()
 
 # Main content
 col1, col2 = st.columns([2, 3])
 
 with col1:
     st.markdown('<p class="medium-font">Weather Station Information</p>', unsafe_allow_html=True)
-    weather_station_info = weather_station_dao.get_weather_station_info(option)
-    located_field = weather_station_dao.get_field(option)['Field_Name'].to_list()
-    located_site = weather_station_dao.get_site(option)['Site_Name'].to_list()
+    weather_station_info = weather_station_dao.get_weather_station_info(st.session_state.selected_weather_station)
+    located_field = weather_station_dao.get_field(st.session_state.selected_weather_station)['Field_Name'].to_list()
+    located_site = weather_station_dao.get_site(st.session_state.selected_weather_station)['Site_Name'].to_list()
     
     
     st.info(f"""
@@ -72,7 +76,7 @@ with col2:
     st.map(weather_station_info, latitude='Latitude', longitude='Longitude')
 
 # Get weather observations of a weather station
-weather_observation_df = weather_station_dao.get_weather_observation(option)
+weather_observation_df = weather_station_dao.get_weather_observation(st.session_state.selected_weather_station)
 
 # Convert 'Date' column to datetime
 weather_observation_df['Date'] = pd.to_datetime(weather_observation_df['Date'], format='%Y-%m-%d')
@@ -81,20 +85,24 @@ weather_observation_df['Date'] = pd.to_datetime(weather_observation_df['Date'], 
 min_date = weather_observation_df['Date'].min()
 max_date = weather_observation_df['Date'].max()
 
+# set default date to min date and one year after min date
+if 'date_range' not in st.session_state:
+    st.session_state.date_range = None
+
 # Two date inputs for start and end dates
-date_range = st.date_input(
+st.session_state.date_range = st.date_input(
         "**Select date range:**",
-        value=[min_date, max_date],
+        value =[min_date, max_date],
         min_value=min_date,
         max_value=max_date,
         format="YYYY-MM-DD",
     )
 
-if len(date_range) != 2:
+if st.session_state.date_range is None or len(st.session_state.date_range) != 2:
     st.stop()
 
 # Filter the DataFrame based on the selected date range
-mask = (weather_observation_df['Date'] >= pd.to_datetime(date_range[0])) & (weather_observation_df['Date'] <= pd.to_datetime(date_range[1]))
+mask = (weather_observation_df['Date'] >= pd.to_datetime(st.session_state.date_range[0])) & (weather_observation_df['Date'] <= pd.to_datetime(st.session_state.date_range[1]))
 filtered_df = weather_observation_df[mask]
 
 # Function to create Streamlit charts

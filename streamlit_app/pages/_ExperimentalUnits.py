@@ -1,25 +1,18 @@
 from api.neo4j import init_driver
 import streamlit as st
 from api.dao.experimentalUnit import ExperimentalUnitDAO
+from components.navigation_bar import navition_bar
 
 # Page config and icon
-st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Experimental Unit", page_icon=":seedling:")
+st.set_page_config(layout="wide", page_title="SOCKG Dashboard - Experimental Unit", page_icon=":triangular_ruler:")
 
 # sidebar for navigation
-st.sidebar.title("Navigation")
-with st.sidebar:
-    st.page_link("dashboard.py", label="Home", icon="🏡")
-    st.page_link("pages/_Fields.py", label="Field Explorer", icon="🏞️")
-    st.page_link("pages/_ExperimentalUnits.py", label="Experimental Unit Explorer", icon="📐")
-    st.page_link("pages/_Treatments.py", label="Treatment Explorer", icon="💊")
-    st.page_link("pages/_WeatherStations.py", label="Weather Station Explorer", icon="🌡️")
-    st.page_link("pages/_Text2Cypher.py", label="Text2Cypher", icon="⌨️")
+navition_bar()
 
 # Initialize driver
 driver = init_driver()
 
 st.title("Experimental Unit Exploration")
-
 #get all experimental units from the database
 exp_unit_dao = ExperimentalUnitDAO(driver)
 ids = exp_unit_dao.get_all_ids()
@@ -28,11 +21,22 @@ ids = exp_unit_dao.get_all_ids()
 if not ids:
     st.error("No experimental units found in the database.")
 
+# initialize selected experimental unit in session state if not already initialized
+if 'selected_exp_unit' not in st.session_state:
+    st.session_state.selected_exp_unit = None
+
 # Experimental unit selection
-option = st.selectbox("Select an experimental unit to explore:", ids)
+option = st.selectbox("Select an experimental unit to explore:", ids, index=None)
+
+if option is not None:
+    st.session_state.selected_exp_unit = option
+
+# stop the script if no experimental unit is selected
+if st.session_state.selected_exp_unit is None:
+    st.stop()
 
 # get all treatments applied to an experimental unit
-treatments_df = exp_unit_dao.get_all_treatments(option)
+treatments_df = exp_unit_dao.get_all_treatments(st.session_state.selected_exp_unit)
 st.subheader("Treatments Applied")
 st.dataframe(treatments_df, use_container_width=True)
 
@@ -41,7 +45,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     # get grain yield of an experimental unit over time
-    grain_yield_df = exp_unit_dao.get_grain_yield(option)
+    grain_yield_df = exp_unit_dao.get_grain_yield(st.session_state.selected_exp_unit)
     st.subheader("Grain Yield Over Time")
     # check for empty dataframe
     if grain_yield_df is not None and not grain_yield_df.empty:
@@ -51,7 +55,7 @@ with col1:
 
 with col2:
     # get soil carbon storage of an experimental unit over time
-    soil_carbon_df = exp_unit_dao.get_soil_carbon(option)
+    soil_carbon_df = exp_unit_dao.get_soil_carbon(st.session_state.selected_exp_unit)
     st.subheader("Soil Carbon Storage Over Time")
     # check for empty dataframe
     if soil_carbon_df is not None and not soil_carbon_df.empty:
@@ -61,7 +65,7 @@ with col2:
     
 
 # get soil chemical properties of an experimental unit over time
-soil_chemical_df = exp_unit_dao.get_soil_chemical_properties(option)
+soil_chemical_df = exp_unit_dao.get_soil_chemical_properties(st.session_state.selected_exp_unit)
 st.subheader("Soil Chemical Properties Over Time")
 # check for empty dataframe
 if soil_chemical_df is not None and not soil_chemical_df.empty:
