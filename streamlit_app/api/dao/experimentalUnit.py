@@ -37,7 +37,8 @@ class ExperimentalUnitDAO:
         
         def get_treatments(tx):
             cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})<-[:appliedInExpUnit]-(t:Treatment)
-                        RETURN 
+                        RETURN
+                            t.treatmentId AS ID,
                             t.treatmentDescriptor AS Name,
                             t.treatmentStartDate AS Start_Date,
                             t.treatmentEndDate AS End_Date
@@ -109,7 +110,9 @@ class ExperimentalUnitDAO:
                             s.soilAmmonium as Ammonium,
                             s.soilNitrate as Nitrate,
                             s.soilPh as PH,
-                            s.totalSoilNitrogen as Nitrogen
+                            s.totalSoilNitrogen as Nitrogen,
+                            s.soilChemLowerDepth as LowerDepth,
+                            s.soilChemUpperDepth as UpperDepth
                         ORDER BY s.soilChemDate ASC"""
             result = tx.run(cypher, expUnit_id=expUnit_id)
             return result.to_df()

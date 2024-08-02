@@ -63,9 +63,13 @@ filtered_treatments = treatment_dao.get_filtered_treatments(selected_tillage, se
 # initialize filtered treatments to an empty dataframe if not already initialized
 if 'filtered_treatments' not in st.session_state:
     st.session_state.filtered_treatments = pd.DataFrame()
-
+    st.session_state.filtered_treatments['ID'] = []
+# initialize selected treatment in session state if not already initialized
+if 'selected_treatment' not in st.session_state:
+    st.session_state.selected_treatment = None
+    
 # select treatment
-if filtered_treatments.empty and st.session_state.filtered_treatments.empty:
+if filtered_treatments.empty and st.session_state.filtered_treatments.empty and st.session_state.selected_treatment is None:
     st.write("No treatments found.")
     st.stop()
 else:
