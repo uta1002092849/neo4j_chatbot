@@ -14,6 +14,7 @@ navition_bar()
 driver = init_driver()
 st.title("Treatment Exploration:")
 
+st.subheader("Select Filters to Explore Treatments:")
 col1, col2 = st.columns(2)
 with col1:
     # Tillage and Residue Management
@@ -74,6 +75,7 @@ else:
 
     # Display number of treatments found
     st.info(f"Number of treatments found: {st.session_state.filtered_treatments.shape[0]}")
+    st.subheader("Filtered Treatments:")
     # Rename columns for better display
     st.session_state.filtered_treatments.rename(columns={
         "Id": "Treatment ID",
@@ -92,7 +94,8 @@ else:
     if 'selected_treatment' not in st.session_state:
         st.session_state.selected_treatment = None
 
-    option = st.selectbox("Select a treatment from the table above to explore:", st.session_state.filtered_treatments['ID'], index=None)
+    st.subheader("Select a Treatment to Explore:")
+    option = st.selectbox("Select a treatment from the table above to explore:", st.session_state.filtered_treatments['ID'], index=None, label_visibility ="collapsed")
     if option is not None:
         st.session_state['selected_treatment'] = option
     

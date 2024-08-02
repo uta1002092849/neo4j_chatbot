@@ -26,7 +26,8 @@ if 'selected_field' not in st.session_state:
     st.session_state.selected_field = None
 
 # Field selection
-option = st.selectbox("Select a field to explore:", ids, index=None)
+st.subheader("Select a field to explore:")
+option = st.selectbox("Select a field to explore:", ids, index=None, label_visibility="collapsed")
 if option is not None:
     st.session_state['selected_field'] = option
 

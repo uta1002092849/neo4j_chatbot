@@ -27,7 +27,8 @@ if 'selected_exp_unit' not in st.session_state:
     st.session_state.selected_exp_unit = None
 
 # Experimental unit selection
-option = st.selectbox("Select an experimental unit to explore:", ids, index=None)
+st.subheader("Select an experimental unit to explore:")
+option = st.selectbox("Select an experimental unit to explore:", ids, index=None, label_visibility="collapsed")
 
 if option is not None:
     st.session_state.selected_exp_unit = option

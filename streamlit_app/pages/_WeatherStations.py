@@ -45,7 +45,7 @@ st.markdown('<p class="medium-font">Select Weather Station</p>', unsafe_allow_ht
 if 'selected_weather_station' not in st.session_state:
     st.session_state.selected_weather_station = None
 
-option = st.selectbox("Choose a weather station to explore:", ids, index=None)
+option = st.selectbox("Choose a weather station to explore:", ids, index=None, label_visibility="collapsed")
 if option is not None:
     st.session_state.selected_weather_station = option
 
@@ -132,5 +132,5 @@ with chart2:
 create_streamlit_chart(filtered_df, 'Date', 'Wind_Speed', "Wind Speed")
 
 # Add a data table for detailed view
-st.markdown('<p class="medium-font">Detailed Weather Data</p>', unsafe_allow_html=True)
+st.subheader("Detailed Weather Observations")
 st.dataframe(filtered_df.style.highlight_max(axis=0), use_container_width=True, hide_index=True, column_order=['Date', 'Open_Pan_Evaporation', 'Precipitation', 'Relative_Humidity_Percent', 'Soil_Temperature_5cm', 'Soil_Temperature_10cm', 'Solar_Radiation_Bare_Soil', 'Min_Temperature', 'Max_Temperature', 'Wind_Speed'])
