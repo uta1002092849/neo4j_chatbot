@@ -46,7 +46,8 @@ if 'selected_weather_station' not in st.session_state:
     st.session_state.selected_weather_station = None
 
 option = st.selectbox("Choose a weather station to explore:", ids, index=None)
-st.session_state.selected_weather_station = option
+if option is not None:
+    st.session_state.selected_weather_station = option
 
 # stop the script if no weather station is selected
 if st.session_state.selected_weather_station is None:
@@ -83,6 +84,8 @@ weather_observation_df['Date'] = pd.to_datetime(weather_observation_df['Date'], 
 
 # Add separate date inputs for start and end dates
 min_date = weather_observation_df['Date'].min()
+
+# set max date to one year after min date
 max_date = weather_observation_df['Date'].max()
 
 # set default date to min date and one year after min date
@@ -90,7 +93,7 @@ if 'date_range' not in st.session_state:
     st.session_state.date_range = None
 
 # Two date inputs for start and end dates
-st.session_state.date_range = st.date_input(
+option = st.date_input(
         "**Select date range:**",
         value =[min_date, max_date],
         min_value=min_date,
@@ -98,8 +101,10 @@ st.session_state.date_range = st.date_input(
         format="YYYY-MM-DD",
     )
 
-if st.session_state.date_range is None or len(st.session_state.date_range) != 2:
+if len(option) != 2:
     st.stop()
+else:
+    st.session_state.date_range = option
 
 # Filter the DataFrame based on the selected date range
 mask = (weather_observation_df['Date'] >= pd.to_datetime(st.session_state.date_range[0])) & (weather_observation_df['Date'] <= pd.to_datetime(st.session_state.date_range[1]))

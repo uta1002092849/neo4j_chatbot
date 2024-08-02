@@ -115,6 +115,9 @@ else:
             "Start_Date": "Start Date",
             "End_Date": "End Date"
         }, inplace=True)
+        
+        # Change dataframe Desciption to 'Not Available' if it is empty
+        expUnits['Description'] = expUnits['Description'].apply(lambda x: 'Not Available' if pd.isnull(x) else x)
         event = st.dataframe(
             expUnits, 
             use_container_width=True,

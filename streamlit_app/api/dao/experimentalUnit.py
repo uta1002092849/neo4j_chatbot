@@ -14,6 +14,23 @@ class ExperimentalUnitDAO:
         with self.driver.session() as session:
             return session.execute_read(get_exp_units)
 
+    # Get experimental unit information
+    def get_exp_unit_info(self, expUnit_id):
+            def get_exp_unit_info(tx):
+                cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})
+                            RETURN
+                                u.expUnit_UID AS ID,
+                                u.expUnitChangeInManagement AS Description,
+                                u.expUnitStartDate AS Start_Date,
+                                u.expUnitEndDate AS End_Date,
+                                u.expUnitSize AS Size,
+                                u.fieldSlopePercent AS SlopePercent,
+                                u.landscapePosition AS LandscapePosition"""
+                result = tx.run(cypher, expUnit_id=expUnit_id)
+                return result.to_df()
+            
+            with self.driver.session() as session:
+                return session.execute_read(get_exp_unit_info)
     
     # get all treatments applied to an experimental unit
     def get_all_treatments(self, expUnit_id):
@@ -33,7 +50,6 @@ class ExperimentalUnitDAO:
     
     # get grain yield of an experimental unit over time
     def get_grain_yield(self, expUnit_id):
-        
         def get_grain_yield(tx):
             cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})-[:isHarvested]->(h:Harvest)
                         WHERE
@@ -56,6 +72,8 @@ class ExperimentalUnitDAO:
                         WHERE 
                             s.totalSoilCarbon IS NOT NULL
                         RETURN
+                            s.soilChemLowerDepth as LowerDepth,
+                            s.soilChemUpperDepth as UpperDepth,
                             s.soilChemDate as Date,
                             s.totalSoilCarbon as SoilCarbon
                         ORDER BY s.soilChemDate ASC"""
