@@ -26,7 +26,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Page title
-st.markdown('<p class="big-font">Weather Station Explorer</p>', unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Weather Station Exploration</h1>", unsafe_allow_html=True)
 
 # Initialize WeatherStationDAO
 weather_station_dao = weatherStationDAO(driver)
@@ -39,7 +39,7 @@ if not ids:
     st.error("No weather stations found in the database.")
 
 # Weather station selection (original box choice)
-st.markdown('<p class="medium-font">Select Weather Station</p>', unsafe_allow_html=True)
+st.subheader("Select a Weather Station:")
 
 # Initialize selected weather station in session state if not already initialized
 if 'selected_weather_station' not in st.session_state:

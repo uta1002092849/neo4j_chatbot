@@ -12,7 +12,7 @@ navition_bar()
 # Initialize driver
 driver = init_driver()
 
-st.title("Field Exploration")
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Field Exploration</h1>", unsafe_allow_html=True)
 # Get all fields from the database
 field_dao = FieldDAO(driver)
 ids = field_dao.get_all_ids()
@@ -26,7 +26,7 @@ if 'selected_field' not in st.session_state:
     st.session_state.selected_field = None
 
 # Field selection
-st.subheader("Select a field to explore:")
+st.subheader("Select a Field:")
 option = st.selectbox("Select a field to explore:", ids, index=None, label_visibility="collapsed")
 if option is not None:
     st.session_state['selected_field'] = option

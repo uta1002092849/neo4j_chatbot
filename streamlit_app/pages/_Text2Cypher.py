@@ -43,7 +43,7 @@ def _set_run_query_cb():
     state['cypher_code'] = None
     state['query_result'] = None
 
-st.header("Text to Cypher Conversion")
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Text To Cypher Conversion</h1>", unsafe_allow_html=True)
 st.subheader("Query the knowledge graph using natural language!")
 
 tutorial_col, tips_col = st.columns([1,1])

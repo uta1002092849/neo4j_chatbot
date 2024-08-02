@@ -13,7 +13,7 @@ navition_bar()
 # Initialize driver
 driver = init_driver()
 
-st.title("Experimental Unit Exploration")
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Experimental Unit Exploration</h1>", unsafe_allow_html=True)
 #get all experimental units from the database
 exp_unit_dao = ExperimentalUnitDAO(driver)
 ids = exp_unit_dao.get_all_ids()
@@ -27,7 +27,7 @@ if 'selected_exp_unit' not in st.session_state:
     st.session_state.selected_exp_unit = None
 
 # Experimental unit selection
-st.subheader("Select an experimental unit to explore:")
+st.subheader("Select an Experimental Unit:")
 option = st.selectbox("Select an experimental unit to explore:", ids, index=None, label_visibility="collapsed")
 
 if option is not None:
