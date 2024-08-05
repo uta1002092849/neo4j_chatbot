@@ -5,7 +5,6 @@ class ExperimentalUnitDAO:
     
     # get the unique ID of all experimental units
     def get_all_ids(self):
-
         def get_exp_units(tx):
             cypher = "MATCH (u:ExperimentalUnit) RETURN u as exp_units"
             result = tx.run(cypher)
