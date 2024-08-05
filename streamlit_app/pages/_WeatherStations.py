@@ -3,6 +3,7 @@ import streamlit as st
 from api.dao.weatherStation import weatherStationDAO
 import pandas as pd
 from components.navigation_bar import navition_bar
+from components.get_pydeck_chart import get_pydeck_chart
 
 driver = init_driver()
 # Page config and icon
@@ -54,11 +55,11 @@ if st.session_state.selected_weather_station is None:
     st.stop()
 
 # Main content
-col1, col2 = st.columns([2, 3])
+col1, col2 = st.columns([2, 3], vertical_alignment="top")
+weather_station_info = weather_station_dao.get_weather_station_info(st.session_state.selected_weather_station)
 
 with col1:
     st.markdown('<p class="medium-font">Weather Station Information</p>', unsafe_allow_html=True)
-    weather_station_info = weather_station_dao.get_weather_station_info(st.session_state.selected_weather_station)
     located_field = weather_station_dao.get_field(st.session_state.selected_weather_station)['Field_Name'].to_list()
     located_site = weather_station_dao.get_site(st.session_state.selected_weather_station)['Site_Name'].to_list()
     
@@ -74,7 +75,14 @@ with col1:
 
 with col2:
     st.markdown('<p class="medium-font">Weather Station Location</p>', unsafe_allow_html=True)
-    st.map(weather_station_info, latitude='Latitude', longitude='Longitude')
+    # st.map(weather_station_info, latitude='Latitude', longitude='Longitude')
+    
+    # extract latitude and longitude
+    latitude = weather_station_info['Latitude'].values[0]
+    longitude = weather_station_info['Longitude'].values[0]
+    
+    # create a map
+    st.pydeck_chart(get_pydeck_chart(longitude, latitude))
 
 # Get weather observations of a weather station
 weather_observation_df = weather_station_dao.get_weather_observation(st.session_state.selected_weather_station)
@@ -115,22 +123,86 @@ def create_streamlit_chart(df, x, y, title):
     st.subheader(title)
     st.line_chart(df.set_index(x)[y])
 
-# Display weather observations as charts
+# Replace the existing chart creation and detailed view code with this:
+
 st.markdown('<p class="medium-font">Weather Observations</p>', unsafe_allow_html=True)
 
 chart1, chart2 = st.columns(2)
 
 with chart1:
-    create_streamlit_chart(filtered_df, 'Date', 'Open_Pan_Evaporation', "Open Pan Evaporation")
-    create_streamlit_chart(filtered_df, 'Date', ['Soil_Temperature_5cm', 'Soil_Temperature_10cm'], "Soil Temperature")
+    # Open Pan Evaporation
+    st.subheader("Open Pan Evaporation")
+    tab1, tab2 = st.tabs(["Chart", "Data"])
+    with tab1:
+        st.line_chart(filtered_df.set_index('Date')['Open_Pan_Evaporation'])
+    with tab2:
+        # get average of Open Pan Evaporation
+        avg_open_pan_evaporation = filtered_df['Open_Pan_Evaporation'].mean()
+        st.metric("Average Open Pan Evaporation", f"{avg_open_pan_evaporation:.2f}")
+        st.dataframe(filtered_df[['Date', 'Open_Pan_Evaporation']].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
+
+    # Soil Temperature
+    st.subheader("Soil Temperature")
+    tab1, tab2 = st.tabs(["Chart", "Data"])
+    with tab1:
+        st.line_chart(filtered_df.set_index('Date')[['Soil_Temperature_5cm', 'Soil_Temperature_10cm']])
+    with tab2:
+        # get average of Soil Temperature
+        avg_soil_temperature_5cm = filtered_df['Soil_Temperature_5cm'].mean()
+        avg_soil_temperature_10cm = filtered_df['Soil_Temperature_10cm'].mean()
+        cols = st.columns(2)
+        with cols[0]:
+            st.metric("Average Soil Temperature 5cm", f"{avg_soil_temperature_5cm:.2f}")
+        with cols[1]:
+            st.metric("Average Soil Temperature 10cm", f"{avg_soil_temperature_10cm:.2f}")
+        st.dataframe(filtered_df[['Date', 'Soil_Temperature_5cm', 'Soil_Temperature_10cm']].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
 
 with chart2:
-    create_streamlit_chart(filtered_df, 'Date', ['Precipitation', 'Relative_Humidity_Percent'], "Precipitation and Relative Humidity")
-    create_streamlit_chart(filtered_df, 'Date', ['Solar_Radiation_Bare_Soil', 'Min_Temperature', 'Max_Temperature'], "Solar Radiation and Temperature")
+    # Precipitation and Relative Humidity
+    st.subheader("Precipitation and Relative Humidity")
+    tab1, tab2 = st.tabs(["Chart", "Data"])
+    with tab1:
+        st.line_chart(filtered_df.set_index('Date')[['Precipitation', 'Relative_Humidity_Percent']])
+    with tab2:
 
-# Display wind speed
-create_streamlit_chart(filtered_df, 'Date', 'Wind_Speed', "Wind Speed")
+        # get average of Precipitation and Relative Humidity
+        avg_precipitation = filtered_df['Precipitation'].mean()
+        avg_relative_humidity = filtered_df['Relative_Humidity_Percent'].mean()
+        cols = st.columns(2)
+        with cols[0]:
+            st.metric("Average Precipitation", f"{avg_precipitation:.2f}")
+        with cols[1]:
+            st.metric("Average Relative Humidity", f"{avg_relative_humidity:.2f}")
+        st.dataframe(filtered_df[['Date', 'Precipitation', 'Relative_Humidity_Percent']].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
 
-# Add a data table for detailed view
-st.subheader("Detailed Weather Observations")
-st.dataframe(filtered_df.style.highlight_max(axis=0), use_container_width=True, hide_index=True, column_order=['Date', 'Open_Pan_Evaporation', 'Precipitation', 'Relative_Humidity_Percent', 'Soil_Temperature_5cm', 'Soil_Temperature_10cm', 'Solar_Radiation_Bare_Soil', 'Min_Temperature', 'Max_Temperature', 'Wind_Speed'])
+    # Solar Radiation and Temperature
+    st.subheader("Solar Radiation and Temperature")
+    tab1, tab2 = st.tabs(["Chart", "Data"])
+    with tab1:
+        st.line_chart(filtered_df.set_index('Date')[['Solar_Radiation_Bare_Soil', 'Min_Temperature', 'Max_Temperature']])
+    with tab2:
+        # get average of Solar Radiation and Temperature
+        avg_solar_radiation = filtered_df['Solar_Radiation_Bare_Soil'].mean()
+        avg_min_temperature = filtered_df['Min_Temperature'].mean()
+        avg_max_temperature = filtered_df['Max_Temperature'].mean()
+        cols = st.columns(3)
+        with cols[0]:
+            st.metric("Average Solar Radiation", f"{avg_solar_radiation:.2f}")
+        with cols[1]:
+            st.metric("Average Min Temperature", f"{avg_min_temperature:.2f}")
+        with cols[2]:
+            st.metric("Average Max Temperature", f"{avg_max_temperature:.2f}")
+        st.dataframe(filtered_df[['Date', 'Solar_Radiation_Bare_Soil', 'Min_Temperature', 'Max_Temperature']].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
+
+# Wind Speed
+st.subheader("Wind Speed")
+tab1, tab2 = st.tabs(["Chart", "Data"])
+with tab1:
+    st.line_chart(filtered_df.set_index('Date')['Wind_Speed'])
+with tab2:
+    # get average of Wind Speed
+    avg_wind_speed = filtered_df['Wind_Speed'].mean()
+    st.metric("Average Wind Speed", f"{avg_wind_speed:.2f}")
+    st.dataframe(filtered_df[['Date', 'Wind_Speed']].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
+
+# Remove the final detailed view section
