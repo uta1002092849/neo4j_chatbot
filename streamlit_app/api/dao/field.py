@@ -81,7 +81,12 @@ class FieldDAO:
         # transaction function
         def get_exp_units(tx):
             cypher = """MATCH (f:Field {fieldId: $field_id})<-[:locatedInField]-(u:ExperimentalUnit)
-                        RETURN u.expUnit_UID as id"""
+                        RETURN
+                            u.expUnit_UID as id,
+                            u.expUnitStartDate as Start_Date,
+                            u.expUnitEndDate as End_Date,
+                            u.expUnitSize as Size
+                        ORDER BY u.expUnitStartDate"""
             result = tx.run(cypher, field_id=field_id)
             return result.to_df()
         # execute transaction
