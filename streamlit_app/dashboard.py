@@ -30,7 +30,7 @@ with col1:
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <h2'>Who can use it?</h2>
+    <h2>Who can use it?</h2>
     <p>SOCKG equips policymakers, land administrators, environmental NGOs, advocacy groups, educators, and realtors with precise data and insights on soil carbon stocks, fluxes, and dynamics, enabling them to make informed decisions regarding climate change mitigation, policy formulation, land use planning, educational teaching, and real estate development.</p>
     """, unsafe_allow_html=True)
 
