@@ -15,12 +15,13 @@ services:
         "run",
         "dashboard.py",
         "--server.port=8501",
-        "--server.baseUrlPath=dashboard"
       ]
     container_name: streamlit_app
     networks:
       - llama3-network
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   llama3:
     image: langchain4j/ollama-llama3
