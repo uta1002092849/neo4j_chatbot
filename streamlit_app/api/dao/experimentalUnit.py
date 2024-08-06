@@ -56,7 +56,8 @@ class ExperimentalUnitDAO:
                             h.harvestedGrainYield IS NOT NULL
                         RETURN
                             h.harvestDate AS Date,
-                            h.harvestedGrainYield AS grainYield
+                            h.harvestedGrainYield AS grainYield,
+                            h.harvestedCrop AS crop
                         ORDER BY h.harvestDate ASC"""
             result = tx.run(cypher, expUnit_id=expUnit_id)
             return result.to_df()
@@ -106,6 +107,7 @@ class ExperimentalUnitDAO:
             cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})-[:hasChemSample]->(s:SoilChemicalSample)
                         RETURN
                             s.soilChemDate as Date,
+                            s.totalSoilCarbon as Carbon,
                             s.soilAmmonium as Ammonium,
                             s.soilNitrate as Nitrate,
                             s.soilPh as PH,
