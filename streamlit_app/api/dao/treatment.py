@@ -10,12 +10,12 @@ class TreatmentDAO:
             cypher = """
             MATCH (treatment:Treatment)-[:hasRotation]->(rotation:Rotation)
             WHERE
-                ($selected_tillage = 'All' OR treatment.tillageDescriptor = $selected_tillage) AND
-                ($selected_rotation = 'All' OR rotation.rotationDescriptor = $selected_rotation) AND
+                (treatment.tillageDescriptor IN $selected_tillage) AND
+                (rotation.rotationDescriptor IN $selected_rotation) AND
                 treatment.irrigation = $selected_irrigation AND
                 treatment.treatmentOrganicManagement = $selected_organic_management AND
-                ($selected_residue_removal = 'All' OR treatment.treatmentResidueRemoval = $selected_residue_removal) AND
-                ($selected_nitrogen = 'All' OR treatment.nitrogenTreatmentDescriptor = $selected_nitrogen)
+                (treatment.treatmentResidueRemoval IN $selected_residue_removal) AND
+                (treatment.nitrogenTreatmentDescriptor IN $selected_nitrogen)
                 """ + ("""
                 AND EXISTS { MATCH (treatment)<-[:hasTreatment]-(:Experiment) }
                 """ if belong_to_experiment else "") + """
