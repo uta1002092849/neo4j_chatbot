@@ -18,30 +18,30 @@ st.subheader("Select Filters to Explore Treatments:")
 col1, col2 = st.columns(2)
 with col1:
     # Tillage and Residue Management
-    tillage_options = ["All", "Conventional Till", "Conservation Till", "No Till", "Not Reported", "Sub Till"]
+    tillage_options = ["Conventional Till", "Conservation Till", "No Till", "Not Reported", "Sub Till"]
     tillage_help_text = "Tillage is the mechanical preparation of soil for planting and cultivation after planting. Choose 'All' to see all tillage types."
-    selected_tillage = st.selectbox("Tillage Descriptor", tillage_options, help=tillage_help_text, index=None)
+    selected_tillage = st.multiselect("Tillage Descriptor", tillage_options, help=tillage_help_text)
     
-    residue_removal_options = ["All", "No", "Partial", "Yes"]
+    residue_removal_options = ["No", "Partial", "Yes"]
     residue_removal_help_text = "Residue removal is the process of removing crop remnants, such as leaves, stalks, and roots, from a field after harvest. Choose 'All' to see all residue removal types."
-    selected_residue_removal = st.selectbox("Residue Removal", residue_removal_options, help=residue_removal_help_text, index=None)
+    selected_residue_removal = st.multiselect("Residue Removal", residue_removal_options, help=residue_removal_help_text)
 
 with col2:
     # Nutrient Management
     nitrogen_options = [
-        "All", "0 N", "0 kg N/ha", "0 kgN/ha (N1)", "0 kg N/ha/y", "60 kgN/ha (N2)",
+        "0 N", "0 kg N/ha", "0 kgN/ha (N1)", "0 kg N/ha/y", "60 kgN/ha (N2)",
         "120 kgN/ha (N3)", "125 kg N/ha/y", "168 kg N/ha", "180 kgN/ha (N4)", "200 kg N/ha/y",
         "202 kg N/ha", "High N", "Low N"
     ]
-    selected_nitrogen = st.selectbox("Nitrogen Amount", nitrogen_options, index=None)
+    selected_nitrogen = st.multiselect("Nitrogen Amount", nitrogen_options)
     
     # Crop Management
     rotation_options = [
-        "All", "Corn", "Corn, Oat/Clover, Sorghum, Soybean", "Corn, Soybean", "Corn, Soybean, Sorghum, Oat/Clover",
+        "Corn", "Corn, Oat/Clover, Sorghum, Soybean", "Corn, Soybean", "Corn, Soybean, Sorghum, Oat/Clover",
         "Soybean", "Soybean, Corn", "Soybean, Sorghum", "Sorghum", "Switchgrass"
     ]
     rotation_help_text = "Crop rotation is the practice of planting different crops in the same field over time. Choose 'All' to see all crop rotations."
-    selected_rotation = st.selectbox("Rotation", rotation_options, help=rotation_help_text, index=None)
+    selected_rotation = st.multiselect("Rotation", rotation_options, help=rotation_help_text)
 
 # Second row of columns
 col3, col4, col5 = st.columns(3)
@@ -74,12 +74,10 @@ if filtered_treatments.empty and st.session_state.filtered_treatments.empty and 
     st.stop()
 else:
     # Save the filtered treatments to a session state
-    if not filtered_treatments.empty:
-        st.session_state.filtered_treatments = filtered_treatments
+    st.session_state.filtered_treatments = filtered_treatments
 
     # Display number of treatments found
     st.info(f"Number of treatments found: {st.session_state.filtered_treatments.shape[0]}")
-    st.subheader("Filtered Treatments:")
     # Rename columns for better display
     st.session_state.filtered_treatments.rename(columns={
         "Id": "Treatment ID",
@@ -88,11 +86,14 @@ else:
         "End_Date": "End Date"
     }, inplace=True)
 
-    st.dataframe(
-        st.session_state.filtered_treatments,
-        use_container_width=True,
-        hide_index=False
-    )
+    # Check if the filtered treatments dataframe is empty
+    if not st.session_state.filtered_treatments.empty:
+        st.subheader("Filtered Treatments:")
+        st.dataframe(
+            st.session_state.filtered_treatments,
+            use_container_width=True,
+            hide_index=False
+        )
 
     # initialize selected treatment in session state if not already initialized
     if 'selected_treatment' not in st.session_state:
