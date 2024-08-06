@@ -7,3 +7,4 @@ langchainhub == 0.1.17
 pandas == 1.5.3
 ollama ==0.2.1
 langchain-chroma == 0.1.1
+plotly == 5.19.0
