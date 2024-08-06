@@ -82,11 +82,14 @@ with col2:
     st.subheader("Field Location")
     # Print out the exact latitude and longitude
     st.info(f"(Latitude, Longitude): ({df['latitude'].values[0]}, {df['longitude'].values[0]})")
-    st.pydeck_chart(get_pydeck_chart(df['longitude'].values[0], df['latitude'].values[0]))  
+    st.pydeck_chart(get_pydeck_chart(df['longitude'].values[0], df['latitude'].values[0]))
 
 # Rainfall data
 st.subheader("Precipitation over Time")
 rainfall_df = field_dao.get_rainfall_df(st.session_state.selected_field)
+
+# Drop rows with missing values
+rainfall_df = rainfall_df.dropna()
 if rainfall_df is not None and not rainfall_df.empty:
     tab1, tab2 = st.tabs(["Chart", "Data"])
     
