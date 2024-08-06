@@ -81,39 +81,19 @@ st.markdown("<h2 style='color: #4CAF50;'>Some more information you might be inte
 tabs = st.tabs(["Carbon Sequestration", "Challenges", "SOCKG Benefits"])
 
 with tabs[0]:
-    with st.expander("Carbon Sequestration"):
+    with st.expander("Carbon Sequestration", expanded=True):
         st.markdown("""
         <p>Carbon sequestration in agricultural soils is an essential strategy in combating global climate change and an important component of the growing voluntary carbon markets. It offers incentives to farmers to adopt sustainable practices that increase soil carbon levels, thus providing environmental and economic benefits and diversifying their farming ventures.</p>
         """, unsafe_allow_html=True)
 
 with tabs[1]:
-    with st.expander("Challenges"):
+    with st.expander("Challenges", expanded=True):
         st.markdown("""
         <p>The complexity and diversity of soil carbon data, combined with environmental factors and land use, make accurate modeling a challenge.</p>
         """, unsafe_allow_html=True)
 
 with tabs[2]:
-    with st.expander("SOCKG Benefits"):
+    with st.expander("SOCKG Benefits", expanded=True):
         st.markdown("""
         <p>SOCKG addresses these challenges by amalgamating and aligning different data sources, facilitating wider-scale research and more effective carbon sequestration strategies. By using advanced querying techniques and machine learning models, SOCKG significantly benefits soil carbon researchers, aiding them in predicting soil carbon stocks and addressing the uncertainty in soil organic carbon-related studies.</p>
         """, unsafe_allow_html=True)
-
-# Adding a footer
-st.write("---")
-st.markdown("""
-<style>
-footer {
-    visibility: hidden;
-}
-footer:after {
-    content:'© 2024 SOCKG Project. All rights reserved.';
-    visibility: visible;
-    display: block;
-    position: relative;
-    padding: 10px;
-    top: 2px;
-    text-align: center;
-    color: #4CAF50;
-}
-</style>
-""", unsafe_allow_html=True)
