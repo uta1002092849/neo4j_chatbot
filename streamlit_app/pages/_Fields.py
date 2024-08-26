@@ -38,16 +38,17 @@ if st.session_state.selected_field is None:
     st.stop()
 
 field_info = field_dao.get_field_info(st.session_state.selected_field)
-st.info(f"""
-    **Field ID:** {st.session_state['selected_field']}\n
-    **Major Land Resource Area:** {field_info['Major_Land_Resource_Area'][0]}\n
-    **Postal Code:** {field_info['Postal_Code'][0] if str(field_info['Postal_Code'][0]) != "nan" else "Not available"}\n
-    **Established Date:** {field_info['establishedDate'][0]}\n
-    **History:** {field_info['History'][0]}\n
-    **Description:** {field_info['Description'][0] if field_info['Description'][0] != None else "Not available"}\n
-    **Native Vegetation:** {field_info['Native_Vegetation'][0]}\n
-    **Spatial Description:** {field_info['Spatial_Description'][0] if str(field_info['Spatial_Description'][0]) != "nan" else "Not available"}\n
-    """)
+
+# string description of the field
+field_desciption = ""
+if 'selected_field' in st.session_state:
+    field_desciption += f"**Field ID:** {st.session_state['selected_field']}  \n"
+# iterate over all columns in field_info
+for column in field_info.columns:
+    if not field_info[column].empty and str(field_info[column][0]) != "nan" and str(field_info[column][0]) != "None":
+        field_desciption += f"**{column}:** {field_info[column][0]}  \n"
+st.info(field_desciption)
+
 
 # Column layout
 col1, col2 = st.columns(2)
@@ -61,13 +62,23 @@ with col1:
 
     # Rename columns for better readability
     exp_units.rename(columns={"id": "Experimental Unit ID", "Start_Date": "Start Date", "End_Date": "End Date", "Size": "Size"}, inplace=True)
-    # Replace end date to 'Present' if it is empty
-    exp_units['End Date'] = exp_units['End Date'].apply(lambda x: 'Present' if pd.isnull(x) else x)
+
+    # Replace None start date and end date with "Not Available"
+    exp_units['Start Date'] = exp_units['Start Date'].apply(lambda x: "Not Available" if pd.isnull(x) else x)
+    exp_units['End Date'] = exp_units['End Date'].apply(lambda x: "Not Available" if pd.isnull(x) else x)
+
+    # If size are all empty, drop the column
+    if exp_units['Size'].isnull().all():
+        exp_units.drop(columns=['Size'], inplace=True)
+    else:
+        # Replace size with "Unknown" if it is empty
+        exp_units['Size'] = exp_units['Size'].apply(lambda x: "Unknown" if pd.isnull(x) else x)
+    
     event = st.dataframe(
         exp_units,
         use_container_width=True,
         hide_index=True,
-        height=490,
+        # height=490,
         on_select='rerun',
         selection_mode='single-row',
         )
@@ -80,9 +91,14 @@ with col2:
     # Get latitude and longitude of the selected field
     df = field_dao.get_lat_long_dataframe(st.session_state.selected_field)
     st.subheader("Field Location")
-    # Print out the exact latitude and longitude
-    st.info(f"(Latitude, Longitude): ({df['latitude'].values[0]}, {df['longitude'].values[0]})")
-    st.pydeck_chart(get_pydeck_chart(df['longitude'].values[0], df['latitude'].values[0]))
+
+    # check if longitude and latitude are nan or nont
+    if df['latitude'].isnull().all() or df['longitude'].isnull().all():
+        st.info("No location data available for this field.")
+    else:
+        # Print out the exact latitude and longitude
+        st.info(f"(Latitude, Longitude): ({df['latitude'].values[0]}, {df['longitude'].values[0]})")
+        st.pydeck_chart(get_pydeck_chart(df['longitude'].values[0], df['latitude'].values[0]))
 
 # Rainfall data
 st.subheader("Precipitation over Time")
@@ -112,3 +128,10 @@ else:
 publications_df = field_dao.get_publications(st.session_state.selected_field)
 st.subheader("Publications on Field")
 st.dataframe(publications_df, use_container_width=True)
+
+
+# test componet
+from streamlit.components.v1 import components
+
+htmlFile = open("network.html", 'r', encoding='utf-8')
+components.iframe(htmlFile.read())

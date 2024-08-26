@@ -37,7 +37,7 @@ class weatherStationDAO:
     def get_weather_observation(self, weatherStation_id):
         
         def get_weather_observation(tx):
-            cypher = """MATCH (w:WeatherStation {weatherStationId: $weatherStation_id})-[:weatherRecordedBy]->(o:WeatherObservation)
+            cypher = """MATCH (w:WeatherStation {weatherStationId: $weatherStation_id})-[:recordsWeatherForField]-(f:Field)-[:weatherAtField]-(o:WeatherObservation)
                         RETURN
                             o.openPanEvaporation as Open_Pan_Evaporation,
                             o.precipitation as Precipitation,
@@ -55,8 +55,7 @@ class weatherStationDAO:
 
         with self.driver.session() as session:
             result = session.execute_read(get_weather_observation)
-            # convert date to datetime
-            result['Date'] = pd.to_datetime(result['Date'], format='%Y-%m-%d')
+
             return result
     
     # get which field this weather station is associated with

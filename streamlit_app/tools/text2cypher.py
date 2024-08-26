@@ -10,7 +10,6 @@ from neo4j_connector.graph import neo4j_graph
 from models.embeddings import llama3_embeddings
 
 
-
 example_prompt = PromptTemplate.from_template(
     "User input: {question}\nCypher query: {query}"
 )

@@ -62,16 +62,16 @@ with col1:
     st.markdown('<p class="medium-font">Weather Station Information</p>', unsafe_allow_html=True)
     located_field = weather_station_dao.get_field(st.session_state.selected_weather_station)['Field_Name'].to_list()
     located_site = weather_station_dao.get_site(st.session_state.selected_weather_station)['Site_Name'].to_list()
-    
-    
-    st.info(f"""
-    **Located on Field:** {" and ".join(located_field)}\n
-    **Located on Site:** {" and ".join(located_site)}\n
-    **Station Direction from Field:** {weather_station_info['Direction_From_Field'][0]}\n
-    **Distance from Field:** {weather_station_info['Distance_From_Field'][0]} m\n
-    **Latitude:** {weather_station_info['Latitude'][0]:.4f}\n
-    **Longitude:** {weather_station_info['Longitude'][0]:.4f}
-    """)
+
+    # Display weather station information
+    weather_station_des = ""
+    if 'selected_weather_station' in st.session_state:
+        weather_station_des += f"**Weather Station ID:** {st.session_state['selected_weather_station']}  \n"
+    # iterate over all columns in weather_station_info
+    for column in weather_station_info.columns:
+        if not weather_station_info[column].empty and str(weather_station_info[column][0]) != "nan" and str(weather_station_info[column][0]) != "None":
+            weather_station_des += f"**{column}:** {weather_station_info[column][0]}  \n"
+    st.info(weather_station_des)
 
 with col2:
     st.markdown('<p class="medium-font">Weather Station Location</p>', unsafe_allow_html=True)
@@ -81,8 +81,11 @@ with col2:
     latitude = weather_station_info['Latitude'].values[0]
     longitude = weather_station_info['Longitude'].values[0]
     
-    # create a map
-    st.pydeck_chart(get_pydeck_chart(longitude, latitude))
+    # Check if latitude and longitude are not null
+    if pd.isnull(latitude) or pd.isnull(longitude):
+        st.info("Latitude and Longitude are not available for this weather station.")
+    else:
+        st.pydeck_chart(get_pydeck_chart(longitude, latitude))
 
 # Get weather observations of a weather station
 weather_observation_df = weather_station_dao.get_weather_observation(st.session_state.selected_weather_station)
@@ -95,6 +98,7 @@ min_date = weather_observation_df['Date'].min()
 
 # set max date to one year after min date
 max_date = weather_observation_df['Date'].max()
+
 
 # set default date to min date and one year after min date
 if 'date_range' not in st.session_state:
