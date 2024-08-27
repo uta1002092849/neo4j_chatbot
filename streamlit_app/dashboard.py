@@ -1,5 +1,6 @@
 import streamlit as st
 from components.navigation_bar import navition_bar
+import streamlit.components.v1 as components
 
 # Page config and icon
 st.set_page_config(layout="wide", page_title="SOCKG Dashboard", page_icon=":seedling:")
@@ -11,7 +12,7 @@ navition_bar()
 st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Welcome to SOCKG Dashboard</h1>", unsafe_allow_html=True)
 
 # Creating two columns for text and image
-col1, col2 = st.columns([1, 1], vertical_alignment="center")
+col1, col2 = st.columns([1, 1])
 
 with col1:
     st.markdown("""
@@ -35,7 +36,10 @@ with col1:
     """, unsafe_allow_html=True)
 
 with col2:
-    st.image("soilcarbon_demo.webp", use_column_width=True)
+    # Displaying the network graph
+    st.markdown("""<h2>SOCKG Network Graph Schema</h2>""", unsafe_allow_html=True)
+    htmlFile = open("network.html", 'r', encoding='utf-8')
+    components.html(htmlFile.read(), height=700)
 
 # Line break for better visual separation
 st.write("---")

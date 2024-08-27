@@ -128,10 +128,3 @@ else:
 publications_df = field_dao.get_publications(st.session_state.selected_field)
 st.subheader("Publications on Field")
 st.dataframe(publications_df, use_container_width=True)
-
-
-# test componet
-from streamlit.components.v1 import components
-
-htmlFile = open("network.html", 'r', encoding='utf-8')
-components.iframe(htmlFile.read())
