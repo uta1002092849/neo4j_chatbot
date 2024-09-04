@@ -1,3 +1,5 @@
+import pandas as pd
+
 class ExperimentalUnitDAO:
 
     def __init__(self, driver):
@@ -85,7 +87,6 @@ class ExperimentalUnitDAO:
             return session.execute_read(get_soil_carbon)
     
     # get soil physical properties of an experimental unit over time
-    # ToDO: Need rework, right now it returns all the soil physical properties of an experimental unit, most of the value are NaN
     def get_soil_physical_properties(self, expUnit_id):
         
         def get_physical_properties(tx):
@@ -120,4 +121,19 @@ class ExperimentalUnitDAO:
         
         with self.driver.session() as session:
             return session.execute_read(get_chemical_properties)
+    
+    # Get soil biological properties of an experimental unit over time
+    def get_soil_biological_properties(self, expUnit_id):
+        def get_biological_properties(tx):
+            cypher = """
+            MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})-[:hasBioSample]->(s:SoilBiologicalSample)
+            RETURN apoc.map.fromPairs([key IN keys(s) | [key, s[key]]]) AS properties
+            ORDER BY s.soilBiolDate ASC
+            """
+            result = tx.run(cypher, expUnit_id=expUnit_id)
+            # Convert the result to a pandas DataFrame
+            data = [record['properties'] for record in result]
+            return pd.DataFrame(data)
         
+        with self.driver.session() as session:
+            return session.execute_read(get_biological_properties)

@@ -191,3 +191,10 @@ else:
     for i, prop in enumerate(soil_properties):
         with col1 if i % 2 == 0 else col2:
             display_soil_properties(soil_chemical_df, prop)
+
+st.subheader("Soil Biological Properties Over Time")
+soil_biological_df = exp_unit_dao.get_soil_biological_properties(st.session_state.selected_exp_unit)
+
+# Drop all columns with not a number values
+# soil_biological_df = soil_biological_df.dropna()
+st.dataframe(soil_biological_df, use_container_width=True, hide_index=True)
