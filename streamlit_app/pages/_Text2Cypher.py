@@ -48,11 +48,6 @@ st.subheader("Query the knowledge graph using natural language!")
 
 tutorial_col, tips_col = st.columns([1,1])
 
-
-# Load html content from file
-
-st.html("./network.html")
-
 with tutorial_col:
     with st.expander("How it works", expanded=False):
         st.write("""

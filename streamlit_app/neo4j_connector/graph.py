@@ -6,7 +6,7 @@ try:
         url = st.secrets['NEO4J_URI'],
         username = st.secrets['NEO4J_USERNAME'],
         password = st.secrets['NEO4J_PASSWORD'],
-        enhanced_schema=True,
+        enhanced_schema=False,
     )
 except Exception as e:
     st.error(f"Error connecting to the database with the error message:\n {e}")

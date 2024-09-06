@@ -39,15 +39,26 @@ if st.session_state.selected_field is None:
 
 field_info = field_dao.get_field_info(st.session_state.selected_field)
 
-# string description of the field
-field_desciption = ""
+# Description of the selected field
+field_description = ""
+
+# Check if 'selected_field' exists in the session state
 if 'selected_field' in st.session_state:
-    field_desciption += f"**Field ID:** {st.session_state['selected_field']}  \n"
-# iterate over all columns in field_info
-for column in field_info.columns:
-    if not field_info[column].empty and str(field_info[column][0]) != "nan" and str(field_info[column][0]) != "None":
-        field_desciption += f"**{column}:** {field_info[column][0]}  \n"
-st.info(field_desciption)
+    field_description += f"**Field ID:** {st.session_state['selected_field']}  \n"
+
+# Replace NaN in 'property' column with 'Not Available'
+field_info['property'] = field_info['property'].fillna('Not Available')
+
+# Ensure all fields in 'field_info' are strings
+field_info = field_info.astype(str)
+
+# Construct the field description from each row in 'field_info'
+for _, row in field_info.iterrows():
+    field_description += f"**{row['key']}:** {row['property']}  \n"
+
+# Display the constructed field description
+st.info(field_description)
+
 
 
 # Column layout
@@ -110,7 +121,8 @@ if rainfall_df is not None and not rainfall_df.empty:
     tab1, tab2 = st.tabs(["Chart", "Data"])
     
     with tab1:
-        st.bar_chart(rainfall_df, x='Period', y='TotalPrecipitation')
+        # Add unit to the y-axis
+        st.bar_chart(rainfall_df, x='Period', y='TotalPrecipitation', use_container_width=True, x_label="Period", y_label="Total Precipitation (cm)")   
     
     with tab2:
         # Calculate average precipitation

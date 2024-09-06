@@ -37,7 +37,7 @@ with col1:
 
 with col2:
     # Displaying the network graph
-    st.markdown("""<h2>SOCKG Network Graph Schema</h2>""", unsafe_allow_html=True)
+    st.markdown("""<h2>Graph Schema</h2>""", unsafe_allow_html=True)
     htmlFile = open("network.html", 'r', encoding='utf-8')
     components.html(htmlFile.read(), height=700)
 

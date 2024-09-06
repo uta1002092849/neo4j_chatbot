@@ -32,6 +32,7 @@ st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Weather Station Exp
 # Initialize WeatherStationDAO
 weather_station_dao = weatherStationDAO(driver)
 
+
 # Get all weather stations from the database
 ids = weather_station_dao.get_all_ids()
 

@@ -19,14 +19,9 @@ class ExperimentalUnitDAO:
     def get_exp_unit_info(self, expUnit_id):
             def get_exp_unit_info(tx):
                 cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})
-                            RETURN
-                                u.expUnit_UID AS ID,
-                                u.expUnitChangeInManagement AS Description,
-                                u.expUnitStartDate AS Start_Date,
-                                u.expUnitEndDate AS End_Date,
-                                u.expUnitSize AS Size,
-                                u.fieldSlopePercent AS SlopePercent,
-                                u.landscapePosition AS LandscapePosition"""
+                            WITH u, keys(u) AS keys
+                            UNWIND keys AS key
+                            RETURN key, apoc.map.get(u, key) AS property"""
                 result = tx.run(cypher, expUnit_id=expUnit_id)
                 return result.to_df()
             
@@ -54,11 +49,9 @@ class ExperimentalUnitDAO:
     def get_grain_yield(self, expUnit_id):
         def get_grain_yield(tx):
             cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})-[:isHarvested]->(h:Harvest)
-                        WHERE
-                            h.harvestedGrainYield IS NOT NULL
                         RETURN
                             h.harvestDate AS Date,
-                            h.harvestedGrainYield AS grainYield,
+                            h.harvestedGrainYield_kg_per_ha AS grainYield,
                             h.harvestedCrop AS crop
                         ORDER BY h.harvestDate ASC"""
             result = tx.run(cypher, expUnit_id=expUnit_id)
@@ -72,13 +65,11 @@ class ExperimentalUnitDAO:
         
         def get_soil_carbon(tx):
             cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})-[:hasChemSample]->(s:SoilChemicalSample)
-                        WHERE 
-                            s.totalSoilCarbon IS NOT NULL
                         RETURN
-                            s.soilChemLowerDepth as LowerDepth,
-                            s.soilChemUpperDepth as UpperDepth,
+                            s.soilChemLowerDepth_cm as LowerDepth,
+                            s.soilChemUpperDepth_cm as UpperDepth,
                             s.soilChemDate as Date,
-                            s.totalSoilCarbon as SoilCarbon
+                            s.totalSoilCarbon_gC_per_kg as SoilCarbon
                         ORDER BY s.soilChemDate ASC"""
             result = tx.run(cypher, expUnit_id=expUnit_id)
             return result.to_df()

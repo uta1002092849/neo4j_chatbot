@@ -22,7 +22,7 @@ class FieldDAO:
     def get_lat_long_dataframe(self, field_id):
         # transaction function
         def get_lat_long(tx):
-            cypher = "MATCH (f:Field {fieldId: $field_id}) RETURN f.fieldLatitude as latitude, f.fieldLongitude as longitude"
+            cypher = "MATCH (f:Field {fieldId: $field_id}) RETURN f.fieldLatitude_decimal_deg as latitude, f.fieldLongitude_decimal_deg as longitude"
             result = tx.run(cypher, field_id=field_id)
             return result.single()
         
@@ -43,7 +43,7 @@ class FieldDAO:
         # transaction function
         def get_rainfall(tx):
             cypher = """MATCH (f:Field {fieldId: $field_id})<-[:weatherAtField]-(w:WeatherObservation)
-                        WITH w.weatherObservationDate AS date, w.precipitation AS precipitation
+                        WITH w.weatherObservationDate AS date, w.precipitation_mm_per_d AS precipitation
                         WITH date, precipitation,
                             toInteger(substring(date, 0, 4)) AS year,
                             toInteger(substring(date, 5, 2)) AS month
@@ -129,14 +129,10 @@ ORDER BY p.publicationDate"""
         # transaction function
         def get_field_info(tx):
             cypher = """MATCH (f:Field {fieldId: $field_id})<-[:hasField]-(s:Site)
-                        RETURN
-                            s.majorLandResourceArea as Major_Land_Resource_Area,
-                            s.postalCodeNumber as Postal_Code,
-                            s.siteDate as establishedDate,
-                            s.siteHistory as History,
-                            s.siteIdDescription as Description,
-                            s.siteNativeVegetation as Native_Vegetation,
-                            s.siteSpatialDescription as Spatial_Description"""
+                        WITH s, keys(s) AS keys
+                            UNWIND keys AS key
+                            RETURN key, apoc.map.get(s, key) AS property
+                    """
             result = tx.run(cypher, field_id=field_id)
             return result.to_df()
         

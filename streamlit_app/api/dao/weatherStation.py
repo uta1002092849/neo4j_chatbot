@@ -17,21 +17,21 @@ class weatherStationDAO:
     
     # get all relevant information of a weather station
     def get_weather_station_info(self, weatherStation_id):
-            
-            def get_weather_station_info(tx):
-                cypher = """MATCH (w:WeatherStation {weatherStationId: $weatherStation_id})
-                            RETURN
-                                w.weatherStationLatitude as Latitude,
-                                w.weatherStationLongitude as Longitude,
-                                w.weatherStationStartDate as Start_Date,
-                                w.weatherStationDirectionFromField as Direction_From_Field,
-                                w.weatherStationDistanceFromField as Distance_From_Field
-                            """
-                result = tx.run(cypher, weatherStation_id=weatherStation_id)
-                return result.to_df()
-            
-            with self.driver.session() as session:
-                return session.execute_read(get_weather_station_info)
+    
+        def get_weather_station_info(tx):
+            cypher = """MATCH (w:WeatherStation {weatherStationId: $weatherStation_id})
+                        RETURN
+                            w.weatherStationLatitude as Latitude,
+                            w.weatherStationLongitude as Longitude,
+                            w.weatherStationStartDate as Start_Date,
+                            w.weatherStationDirectionFromField as Direction_From_Field,
+                            w.weatherStationDistanceFromField as Distance_From_Field
+                        """
+            result = tx.run(cypher, weatherStation_id=weatherStation_id)
+            return result.to_df()
+        
+        with self.driver.session() as session:
+            return session.execute_read(get_weather_station_info)
     
     # get number of weather observations of a weather station
     def get_weather_observation(self, weatherStation_id):

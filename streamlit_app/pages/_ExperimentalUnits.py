@@ -40,23 +40,18 @@ if st.session_state.selected_exp_unit is None:
     
 # Fetch and Display information about the selected experimental unit
 experimental_unit_info = exp_unit_dao.get_exp_unit_info(st.session_state.selected_exp_unit)
-# st.info(f"""
-#     **Experimental Unit ID:** {experimental_unit_info['ID'][0]}\n
-#     **Description:** {experimental_unit_info['Description'][0] if str(experimental_unit_info['Description'][0]) != 'nan' else "Unavailable"}\n
-#     **Start Date:** {experimental_unit_info['Start_Date'][0] if str(experimental_unit_info['Start_Date'][0]) != 'nan' else "Unavailable"}\n
-#     **End Date:** {experimental_unit_info['End_Date'][0] if str(experimental_unit_info['End_Date'][0]) != 'nan' else "Present"}\n
-#     **Size:** {experimental_unit_info['Size'][0]}\n
-#     **Field Slope Percent:** {experimental_unit_info['SlopePercent'][0]}\n
-#     **Landscape Position:** {experimental_unit_info['LandscapePosition'][0]}
-#     """)
+
 
 exp_unit_desciption = ""
 if 'selected_exp_unit' in st.session_state:
     exp_unit_desciption += f"**Experimental Unit ID:** {st.session_state['selected_exp_unit']}  \n"
-# iterate over all columns in experimental_unit_info
-for column in experimental_unit_info.columns:
-    if not experimental_unit_info[column].empty and str(experimental_unit_info[column][0]) != "nan" and str(experimental_unit_info[column][0]) != "None":
-        exp_unit_desciption += f"**{column}:** {experimental_unit_info[column][0]}  \n"
+
+# Replace nan in Property with `Not Available`
+experimental_unit_info['property'] = experimental_unit_info['property'].apply(lambda x: 'Not Available' if pd.isnull(x) else x)
+
+for index, row in experimental_unit_info.iterrows():
+    exp_unit_desciption += f"**{row['key']}:** {row['property']}  \n"
+
 st.info(exp_unit_desciption)
 
 
