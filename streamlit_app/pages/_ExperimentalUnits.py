@@ -101,10 +101,9 @@ if grain_yield_df is not None and not grain_yield_df.empty:
     grain_yield_df.rename(columns={"Date": "Date", "grainYield": "Grain Yield"}, inplace=True)
     tab1, tab2 = st.tabs(["Chart", "Data"])
     with tab1:
-        # figure = px.line(grain_yield_df, x='Date', y='Grain Yield', color='crop')
         
         # Bar chart
-        figure = px.bar(grain_yield_df, x='Date', y='Grain Yield', color='crop')
+        figure = px.bar(grain_yield_df, x='Date', y='Grain Yield', color='crop', labels={'Date': 'Date', 'Grain Yield': 'Grain Yield (kg/ha)'})
         st.plotly_chart(figure, use_container_width=True)
 
     with tab2:
@@ -141,7 +140,7 @@ def display_soil_properties(soil_chemical_df, prop):
     else:
         tab1, tab2 = st.tabs(["Chart", "Data"])
         with tab1:
-            figure = px.scatter_3d(soil_chemical_df, x='Date', y='Average Depth', z=prop, color=prop)
+            figure = px.scatter_3d(soil_chemical_df, x='Date', y='Average Depth (cm)', z=prop, color=prop)
             st.plotly_chart(figure, use_container_width=True)
         with tab2:
             avg_value = soil_chemical_df[prop].mean()
@@ -157,7 +156,7 @@ def display_soil_properties(soil_chemical_df, prop):
             with cols[2]:
                 st.metric(f"Maximum {prop}", f"{max_value:.2f}")
             
-            st.dataframe(soil_chemical_df[['Date', 'Average Depth', prop]].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
+            st.dataframe(soil_chemical_df[['Date', 'Average Depth (cm)', prop]].style.highlight_max(axis=0), use_container_width=True, hide_index=True)
 
 # Get all soil chemical properties
 soil_chemical_df = exp_unit_dao.get_soil_chemical_properties(st.session_state.selected_exp_unit)
@@ -167,29 +166,37 @@ soil_chemical_df = soil_chemical_df.dropna()
 
 # Rename collumns to match with multi-select box
 soil_chemical_df.rename(columns={
-    "Date": "Date", "Carbon": "Soil Carbon",
-    "Ammonium": "Ammonium", "Nitrate": "Nitrate",
-    "PH": "pH", "Nitrogen": "Total Nitrogen",
+    "Date": "Date", "Carbon": "Soil Carbon (gC per kg)",
+    "Ammonium": "Ammonium (mgN per kg)", "Nitrate": "Soil Nitrate (mgN per kg)",
+    "PH": "pH", "Nitrogen": "Total Soil Nitrogen (gN per kg)",
     "LowerDepth": "Lower Depth", "UpperDepth": "Upper Depth"
 }, inplace=True)
 
+# mapping between original column names and new column names
+column_mapping = {
+    "Soil Carbon": "Soil Carbon (gC per kg)",
+    "Ammonium": "Ammonium (mgN per kg)",
+    "Nitrate": "Soil Nitrate (mgN per kg)",
+    "pH": "pH",
+    "Total Nitrogen": "Total Soil Nitrogen (gN per kg)"
+}
+
 # Add average depth column
-soil_chemical_df['Average Depth'] = (soil_chemical_df['Lower Depth'] + soil_chemical_df['Upper Depth']) // 2
+soil_chemical_df['Average Depth (cm)'] = (soil_chemical_df['Lower Depth'] + soil_chemical_df['Upper Depth']) // 2
 
 # Display the selected soil properties
 # Check if there is only one soil property selected
 if len(soil_properties) == 1:
-    display_soil_properties(soil_chemical_df, soil_properties[0])
+    display_soil_properties(soil_chemical_df, column_mapping[soil_properties[0]])
 else:
     # divide the screen into two columns
     col1, col2 = st.columns(2)
     for i, prop in enumerate(soil_properties):
         with col1 if i % 2 == 0 else col2:
-            display_soil_properties(soil_chemical_df, prop)
+            display_soil_properties(soil_chemical_df, column_mapping[prop])
 
-st.subheader("Soil Biological Properties Over Time")
-soil_biological_df = exp_unit_dao.get_soil_biological_properties(st.session_state.selected_exp_unit)
-
+# st.subheader("Soil Biological Properties Over Time")
+# soil_biological_df = exp_unit_dao.get_soil_biological_properties(st.session_state.selected_exp_unit)
 # Drop all columns with not a number values
 # soil_biological_df = soil_biological_df.dropna()
-st.dataframe(soil_biological_df, use_container_width=True, hide_index=True)
+# st.dataframe(soil_biological_df, use_container_width=True, hide_index=True)

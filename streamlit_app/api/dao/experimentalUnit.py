@@ -99,13 +99,13 @@ class ExperimentalUnitDAO:
             cypher = """MATCH (u:ExperimentalUnit {expUnit_UID: $expUnit_id})-[:hasChemSample]->(s:SoilChemicalSample)
                         RETURN
                             s.soilChemDate as Date,
-                            s.totalSoilCarbon as Carbon,
-                            s.soilAmmonium as Ammonium,
-                            s.soilNitrate as Nitrate,
+                            s.totalSoilCarbon_gC_per_kg as Carbon,
+                            s.soilAmmonium_mgN_per_kg as Ammonium,
+                            s.soilNitrate_mgN_per_kg as Nitrate,
                             s.soilPh as PH,
-                            s.totalSoilNitrogen as Nitrogen,
-                            s.soilChemLowerDepth as LowerDepth,
-                            s.soilChemUpperDepth as UpperDepth
+                            s.totalSoilNitrogen_gN_per_kg as Nitrogen,
+                            s.soilChemLowerDepth_cm as LowerDepth,
+                            s.soilChemUpperDepth_cm as UpperDepth
                         ORDER BY s.soilChemDate ASC"""
             result = tx.run(cypher, expUnit_id=expUnit_id)
             return result.to_df()

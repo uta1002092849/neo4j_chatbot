@@ -21,10 +21,10 @@ class weatherStationDAO:
         def get_weather_station_info(tx):
             cypher = """MATCH (w:WeatherStation {weatherStationId: $weatherStation_id})
                         RETURN
-                            w.weatherStationLatitude as Latitude,
-                            w.weatherStationLongitude as Longitude,
+                            w.weatherStationLatitude_decimal_deg as Latitude,
+                            w.weatherStationLongitude_decimal_deg as Longitude,
                             w.weatherStationStartDate as Start_Date,
-                            w.weatherStationDirectionFromField as Direction_From_Field,
+                            w.weatherStationDirectionFromField_m as Direction_From_Field,
                             w.weatherStationDistanceFromField as Distance_From_Field
                         """
             result = tx.run(cypher, weatherStation_id=weatherStation_id)
