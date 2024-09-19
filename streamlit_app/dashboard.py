@@ -52,27 +52,25 @@ st.markdown("""
 <ul>
 <li><b>Data Exploration:</b> This section allows users to explore the knowledge graph by selecting an entity of interest. Once selected, the dashboard will display that entity information, as well as some predefined information by joining with other entities in the knowledge graph.</li>
 <li><b>Natural Language Query:</b> This section allows users to query the SOCKG knowledge graph using natural language queries. If the data exploration tab does not provide the information you are looking for, you can use the natural language query tab to ask questions about the knowledge graph.</li>
-</ul>
-<p>To get started, select any of the pages on your left-hand side or you can also select them here!</p>
-""", unsafe_allow_html=True)
+</ul>""", unsafe_allow_html=True)
 
-# A list of buttons to navigate to different pages
-b1, b2, b3, b4, b5 = st.columns(5, gap="medium")
-with b1:
-    if st.button("Field", type="secondary"):
-        st.switch_page("pages/_Fields.py")
-with b2:
-    if st.button("Experimental Unit", type="secondary"):
-        st.switch_page("pages/_ExperimentalUnits.py")
-with b3:
-    if st.button("Treatment", type="secondary"):
-        st.switch_page("pages/_Treatment.py")
-with b4:
-    if st.button("Weather Station", type="secondary"):
-        st.switch_page("pages/_WeatherStations.py")
-with b5:
-    if st.button("Natural Language Query", type="secondary"):
-        st.switch_page("pages/_Text2Cypher.py")
+# # A list of buttons to navigate to different pages
+# b1, b2, b3, b4, b5 = st.columns(5, gap="medium")
+# with b1:
+#     if st.button("Field", type="secondary"):
+#         st.switch_page("pages/_Fields.py")
+# with b2:
+#     if st.button("Experimental Unit", type="secondary"):
+#         st.switch_page("pages/_ExperimentalUnits.py")
+# with b3:
+#     if st.button("Treatment", type="secondary"):
+#         st.switch_page("pages/_Treatment.py")
+# with b4:
+#     if st.button("Weather Station", type="secondary"):
+#         st.switch_page("pages/_WeatherStations.py")
+# with b5:
+#     if st.button("Natural Language Query", type="secondary"):
+#         st.switch_page("pages/_Text2Cypher.py")
 
 
 # Line break for better visual separation
