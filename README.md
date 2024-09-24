@@ -62,7 +62,8 @@ After the Docker build process completes and containers are running:
 2. Explore the SOCKG Dashboard web interface.
 3. Use the features for visualization and querying the SOCKG database
 
-Note: The application runs on port 8501 by default. Ensure this port is not in use by other applications on your system.
+Note: The application runs on port 8501 by default. Ensure this port is not in use by other applications on your system.\
+A demo run can be found here: https://drive.google.com/file/d/1FQL0SbjMagDgBDL23wy9asF-TuvJwQZ3/view?usp=drive_link
 
 ## Directory Structure
 The project is organized as follows:
